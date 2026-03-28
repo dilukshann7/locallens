@@ -8,5 +8,23 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: false,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "tourist",
+        input: false,
+      },
+    },
+  },
+  // Advanced configuration for security
+  advanced: {
+    cookiePrefix: "locallens",
+    crossSubDomainCookies: {
+      enabled: false,
+    },
   },
 })
