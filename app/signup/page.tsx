@@ -30,24 +30,39 @@ export default function SignupPage() {
 
     setLoading(true)
 
-    await signUp.email({
-      name,
-      email,
-      password,
-      fetchOptions: {
-        onSuccess() {
-          window.location.href = "/"
-        },
-        onError(ctx) {
-          setError(ctx.error.message || "Failed to sign up")
-          setLoading(false)
-        },
-      },
-    })
+    try {
+      const { data, error: signUpError } = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      })
+
+      if (signUpError) {
+        setError(signUpError.message || "Failed to sign up")
+        setLoading(false)
+        return
+      }
+
+      // Check if admin and redirect
+      try {
+        const res = await fetch("/api/check-admin")
+        const data = await res.json()
+        if (data.isAdmin) {
+          router.push("/admin")
+        } else {
+          router.push("/")
+        }
+      } catch {
+        router.push("/")
+      }
+    } catch (err) {
+      setError("Something went wrong")
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-zinc-50 to-zinc-100 p-4 dark:from-zinc-950 dark:to-zinc-900">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 p-4 dark:from-zinc-950 dark:to-zinc-900">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight">LocalLens</h1>
