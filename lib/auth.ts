@@ -22,7 +22,7 @@ export const auth = betterAuth({
       },
     },
   },
-  // Advanced configuration for security
+  trustedOrigins: ["http://localhost:3000"],
   advanced: {
     cookiePrefix: "locallens",
     crossSubDomainCookies: {
