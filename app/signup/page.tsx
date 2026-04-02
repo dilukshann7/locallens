@@ -1,10 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { signUp } from "@/lib/auth/client"
+import { authClient } from "@/lib/auth/client"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function SignupPage() {
+  const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
