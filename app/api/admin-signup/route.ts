@@ -5,7 +5,7 @@ import { NextResponse } from "next/server"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { name, email, password } = body
+    const { name, email, password, adminSecret } = body
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -18,6 +18,13 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Password must be at least 8 characters" },
         { status: 400 }
+      )
+    }
+
+    if (adminSecret !== process.env.ADMIN_SECRET) {
+      return NextResponse.json(
+        { error: "Invalid admin secret" },
+        { status: 403 }
       )
     }
 
@@ -34,13 +41,10 @@ export async function POST(req: Request) {
 
     // Update user role to admin
     const db = await import("@/lib/db").then((m) => m.db)
-    const { user, userRoleEnum } = await import("@/lib/db/schema")
+    const { user } = await import("@/lib/db/schema")
     const { eq } = await import("drizzle-orm")
 
-    await db
-      .update(user)
-      .set({ role: "admin" })
-      .where(eq(user.email, email))
+    await db.update(user).set({ role: "admin" }).where(eq(user.email, email))
 
     return NextResponse.json({ success: true })
   } catch (error) {
