@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Clock, Plus, Check } from "lucide-react"
+import { MapPin, Clock, Plus, Check, Star } from "lucide-react"
 import Image from "next/image"
 import type { AttractionRecord } from "@/lib/attractions"
 
@@ -124,6 +124,12 @@ export function AttractionCard({
               <span className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />
                 {attraction.suggestedVisitDurationMinutes}m
+              </span>
+            )}
+            {attraction.reviewCount > 0 && attraction.averageRating && (
+              <span className="flex items-center gap-1.5">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+                {attraction.averageRating.toFixed(1)} ({attraction.reviewCount})
               </span>
             )}
             {attraction.bestTimeToVisit && (
