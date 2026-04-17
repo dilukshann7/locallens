@@ -68,7 +68,7 @@ export default async function AttractionDetailPage({
                   priority
                 />
               ) : (
-                <div className="flex h-full items-center justify-center text-zinc-400">
+                <div className="flex h-full items-center justify-center text-zinc-400 dark:text-zinc-700">
                   <MapPin className="h-10 w-10" />
                 </div>
               )}
@@ -79,7 +79,7 @@ export default async function AttractionDetailPage({
                     {attraction.category.name}
                   </span>
                 )}
-                <h1 className="mt-3 max-w-2xl font-serif text-4xl tracking-tight sm:text-5xl">
+                <h1 className="mt-3 max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
                   {attraction.name}
                 </h1>
                 {attraction.shortDescription && (
@@ -92,21 +92,21 @@ export default async function AttractionDetailPage({
 
             <div className="space-y-6 p-6 sm:p-8">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50/80 p-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase">
+                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase dark:text-zinc-400">
                     Distance
                   </p>
-                  <p className="mt-3 text-2xl font-semibold text-zinc-950">
+                  <p className="mt-3 text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
                     {attraction.distanceFromBeragalaKm
                       ? `${attraction.distanceFromBeragalaKm} km`
                       : "Local pick"}
                   </p>
                 </div>
-                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50/80 p-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase">
+                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                  <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase dark:text-zinc-400">
                     Suggested Time
                   </p>
-                  <p className="mt-3 text-2xl font-semibold text-zinc-950">
+                  <p className="mt-3 text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
                     {attraction.suggestedVisitDurationMinutes
                       ? `${attraction.suggestedVisitDurationMinutes} min`
                       : "Flexible"}
@@ -115,14 +115,14 @@ export default async function AttractionDetailPage({
               </div>
 
               {attraction.address && (
-                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-white/75 p-4">
+                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
                   <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-5 w-5 text-emerald-600" />
+                    <MapPin className="mt-0.5 h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                     <div>
-                      <p className="text-sm font-medium text-zinc-950">
+                      <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
                         Where to go
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
                         {attraction.address}
                       </p>
                     </div>
@@ -131,14 +131,14 @@ export default async function AttractionDetailPage({
               )}
 
               {attraction.bestTimeToVisit && (
-                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-white/75 p-4">
+                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
                   <div className="flex items-start gap-3">
-                    <Clock3 className="mt-0.5 h-5 w-5 text-sky-600" />
+                    <Clock3 className="mt-0.5 h-5 w-5 text-sky-600 dark:text-sky-400" />
                     <div>
-                      <p className="text-sm font-medium text-zinc-950">
+                      <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
                         Best time to visit
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
                         {attraction.bestTimeToVisit}
                       </p>
                     </div>
@@ -150,12 +150,12 @@ export default async function AttractionDetailPage({
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-[2rem] border border-black/5 bg-white/80 p-6 shadow-[0_24px_80px_rgba(24,24,24,0.08)] backdrop-blur-xl sm:p-8">
-            <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase">
+          <article className="rounded-[2rem] border border-zinc-200/70 bg-white p-6 shadow-sm backdrop-blur-xl sm:p-8 dark:border-zinc-800/70 dark:bg-zinc-950">
+            <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
               Story
             </p>
             <div className="prose prose-zinc mt-4 max-w-none">
-              <p className="text-base leading-8 text-zinc-700">
+              <p className="text-base leading-8 text-zinc-700 dark:text-zinc-300">
                 {attraction.description}
               </p>
             </div>
@@ -163,20 +163,20 @@ export default async function AttractionDetailPage({
 
           <aside className="space-y-6">
             {(attraction.safetyNote || attraction.weatherNote) && (
-              <section className="rounded-[2rem] border border-black/5 bg-white/80 p-6 shadow-[0_24px_80px_rgba(24,24,24,0.08)] backdrop-blur-xl">
-                <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase">
+              <section className="rounded-[2rem] border border-zinc-200/70 bg-white p-6 shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
+                <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
                   Field Notes
                 </p>
                 <div className="mt-5 space-y-4">
                   {attraction.safetyNote && (
-                    <div className="rounded-[1.4rem] border border-rose-200/80 bg-rose-50/80 p-4">
+                    <div className="rounded-[1.4rem] border border-rose-200/80 bg-rose-50/80 p-4 dark:border-rose-900/40 dark:bg-rose-950/20">
                       <div className="flex items-start gap-3">
-                        <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-600" />
+                        <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-600 dark:text-rose-400" />
                         <div>
-                          <p className="text-sm font-medium text-rose-900">
+                          <p className="text-sm font-medium text-rose-900 dark:text-rose-200">
                             Safety note
                           </p>
-                          <p className="mt-1 text-sm leading-6 text-rose-800/80">
+                          <p className="mt-1 text-sm leading-6 text-rose-800/80 dark:text-rose-200/80">
                             {attraction.safetyNote}
                           </p>
                         </div>
@@ -185,14 +185,14 @@ export default async function AttractionDetailPage({
                   )}
 
                   {attraction.weatherNote && (
-                    <div className="rounded-[1.4rem] border border-sky-200/80 bg-sky-50/80 p-4">
+                    <div className="rounded-[1.4rem] border border-sky-200/80 bg-sky-50/80 p-4 dark:border-sky-900/40 dark:bg-sky-950/20">
                       <div className="flex items-start gap-3">
-                        <CloudRain className="mt-0.5 h-5 w-5 text-sky-600" />
+                        <CloudRain className="mt-0.5 h-5 w-5 text-sky-600 dark:text-sky-400" />
                         <div>
-                          <p className="text-sm font-medium text-sky-900">
+                          <p className="text-sm font-medium text-sky-900 dark:text-sky-200">
                             Weather note
                           </p>
-                          <p className="mt-1 text-sm leading-6 text-sky-800/80">
+                          <p className="mt-1 text-sm leading-6 text-sky-800/80 dark:text-sky-200/80">
                             {attraction.weatherNote}
                           </p>
                         </div>
@@ -204,15 +204,15 @@ export default async function AttractionDetailPage({
             )}
 
             {attraction.images && attraction.images.length > 1 && (
-              <section className="rounded-[2rem] border border-black/5 bg-white/80 p-6 shadow-[0_24px_80px_rgba(24,24,24,0.08)] backdrop-blur-xl">
-                <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase">
+              <section className="rounded-[2rem] border border-zinc-200/70 bg-white p-6 shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
+                <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
                   Gallery
                 </p>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   {attraction.images.slice(1).map((imageUrl, index) => (
                     <div
                       key={imageUrl}
-                      className="relative aspect-square overflow-hidden rounded-[1.2rem] bg-zinc-100"
+                      className="relative aspect-square overflow-hidden rounded-[1.2rem] bg-zinc-100 dark:bg-zinc-900"
                     >
                       <Image
                         src={imageUrl}
