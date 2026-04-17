@@ -48,11 +48,15 @@ function getPlannerPayload(body: unknown): PlannerState | null {
                   ? item.shortDescription
                   : undefined,
               categoryId:
-                typeof item.categoryId === "string" ? item.categoryId : undefined,
-              latitude: typeof item.latitude === "string" ? item.latitude : undefined,
+                typeof item.categoryId === "string"
+                  ? item.categoryId
+                  : undefined,
+              latitude:
+                typeof item.latitude === "string" ? item.latitude : undefined,
               longitude:
                 typeof item.longitude === "string" ? item.longitude : undefined,
-              address: typeof item.address === "string" ? item.address : undefined,
+              address:
+                typeof item.address === "string" ? item.address : undefined,
               distanceFromBeragalaKm:
                 typeof item.distanceFromBeragalaKm === "string"
                   ? item.distanceFromBeragalaKm
@@ -71,11 +75,21 @@ function getPlannerPayload(body: unknown): PlannerState | null {
                   ? item.bestTimeToVisit
                   : undefined,
               weatherNote:
-                typeof item.weatherNote === "string" ? item.weatherNote : undefined,
+                typeof item.weatherNote === "string"
+                  ? item.weatherNote
+                  : undefined,
               safetyNote:
-                typeof item.safetyNote === "string" ? item.safetyNote : undefined,
+                typeof item.safetyNote === "string"
+                  ? item.safetyNote
+                  : undefined,
               isPopular: Boolean(item.isPopular),
               isActive: item.isActive !== false,
+              averageRating:
+                typeof item.averageRating === "number"
+                  ? item.averageRating
+                  : undefined,
+              reviewCount:
+                typeof item.reviewCount === "number" ? item.reviewCount : 0,
               category: undefined,
             },
             {
@@ -102,11 +116,15 @@ function getPlannerPayload(body: unknown): PlannerState | null {
 
   return {
     tripName:
-      "tripName" in body && typeof body.tripName === "string" && body.tripName.trim()
+      "tripName" in body &&
+      typeof body.tripName === "string" &&
+      body.tripName.trim()
         ? body.tripName
         : fallback.tripName,
     tripDate:
-      "tripDate" in body && typeof body.tripDate === "string" ? body.tripDate : "",
+      "tripDate" in body && typeof body.tripDate === "string"
+        ? body.tripDate
+        : "",
     dayStartTime:
       "dayStartTime" in body && typeof body.dayStartTime === "string"
         ? body.dayStartTime
@@ -163,7 +181,10 @@ export async function PUT(
     const planner = getPlannerPayload(body)
 
     if (!planner) {
-      return NextResponse.json({ error: "Invalid trip payload" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Invalid trip payload" },
+        { status: 400 }
+      )
     }
 
     const { id } = await params
@@ -176,6 +197,9 @@ export async function PUT(
     return NextResponse.json({ tripId: id, planner: updatedPlanner })
   } catch (error) {
     console.error("Trip update error:", error)
-    return NextResponse.json({ error: "Failed to update trip" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to update trip" },
+      { status: 500 }
+    )
   }
 }

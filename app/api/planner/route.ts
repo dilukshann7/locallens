@@ -88,6 +88,12 @@ function getPlannerPayload(body: unknown): PlannerState | null {
                   : undefined,
               isPopular: Boolean(item.isPopular),
               isActive: item.isActive !== false,
+              averageRating:
+                typeof item.averageRating === "number"
+                  ? item.averageRating
+                  : undefined,
+              reviewCount:
+                typeof item.reviewCount === "number" ? item.reviewCount : 0,
               category: undefined,
             },
             {

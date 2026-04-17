@@ -64,6 +64,9 @@ function parseStoredAttraction(item: unknown): AttractionRecord | null {
       typeof item.safetyNote === "string" ? item.safetyNote : undefined,
     isPopular: Boolean(item.isPopular),
     isActive: item.isActive !== false,
+    averageRating:
+      typeof item.averageRating === "number" ? item.averageRating : undefined,
+    reviewCount: typeof item.reviewCount === "number" ? item.reviewCount : 0,
     category:
       isRecord(item.category) &&
       typeof item.category.id === "string" &&
