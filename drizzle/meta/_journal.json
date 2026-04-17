@@ -15,6 +15,13 @@
       "when": 1774710892370,
       "tag": "0001_nifty_toxin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776446890386,
+      "tag": "0002_nervous_tana_nile",
+      "breakpoints": true
     }
   ]
 }

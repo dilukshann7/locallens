@@ -160,6 +160,28 @@ export const attraction = pgTable(
   ]
 )
 
+export const review = pgTable(
+  "review",
+  {
+    id: text("id").primaryKey(),
+    attractionId: text("attraction_id")
+      .notNull()
+      .references(() => attraction.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
+    authorName: text("author_name").notNull(),
+    rating: integer("rating").notNull(),
+    body: text("body"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("review_attraction_idx").on(table.attractionId),
+    index("review_user_idx").on(table.userId),
+    index("review_created_at_idx").on(table.createdAt),
+  ]
+)
+
 export const itinerary = pgTable(
   "itinerary",
   {
