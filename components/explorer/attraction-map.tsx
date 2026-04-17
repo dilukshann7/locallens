@@ -89,8 +89,8 @@ export function AttractionMap({
   const center: [number, number] = [6.78, 80.78]
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
-      <CardHeader className="pb-2">
+    <Card className={cn("h-full gap-0 overflow-hidden py-0", className)}>
+      <CardHeader className="shrink-0 py-4">
         <CardTitle className="flex items-center gap-2 text-lg">
           <MapPin className="h-5 w-5 text-primary" />
           Explore on Map
@@ -99,8 +99,8 @@ export function AttractionMap({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="relative h-100">
+      <CardContent className="min-h-0 flex-1 p-0">
+        <div className="relative h-full min-h-0">
           <MapContainer
             center={center}
             zoom={11}

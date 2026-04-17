@@ -226,12 +226,12 @@ export function TouristExplorer({
           open={!!selectedAttraction}
           onOpenChange={(open) => !open && setSelectedAttraction(null)}
         >
-          <SheetContent className="w-full overflow-y-auto p-0 sm:max-w-lg">
+          <SheetContent className="flex w-full flex-col overflow-hidden p-0 sm:max-w-lg">
             <SheetTitle className="sr-only">
               {selectedAttraction?.name || "Attraction Details"}
             </SheetTitle>
             {selectedAttraction && (
-              <div className="flex h-full flex-col bg-white dark:bg-zinc-950">
+              <div className="flex h-full min-h-0 flex-col bg-white dark:bg-zinc-950">
                 <div className="relative h-72 w-full shrink-0 bg-zinc-100 dark:bg-zinc-900">
                   {selectedAttraction.images &&
                   selectedAttraction.images.length > 0 ? (
@@ -265,7 +265,7 @@ export function TouristExplorer({
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-8 p-6">
+                <div className="min-h-0 flex-1 space-y-8 overflow-y-auto p-6 pb-8">
                   <div className="flex flex-wrap gap-4 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900">
                     {selectedAttraction.distanceFromBeragalaKm && (
                       <div className="flex flex-col gap-1">
@@ -372,28 +372,28 @@ export function TouristExplorer({
                         </div>
                       </div>
                     )}
+                </div>
 
-                  <div className="border-t border-zinc-100 pt-4 dark:border-zinc-800">
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <button
-                        onClick={() => handlePlannerToggle(selectedAttraction)}
-                        className={`rounded-xl py-3.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.98] ${
-                          isInPlanner(selectedAttraction.id)
-                            ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
-                            : "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
-                        }`}
-                      >
-                        {isInPlanner(selectedAttraction.id)
-                          ? "Remove from Planner"
-                          : "Add to Planner"}
-                      </button>
-                      <Link
-                        href={`/attractions/${selectedAttraction.id}`}
-                        className="flex items-center justify-center rounded-xl border border-zinc-200 py-3.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
-                      >
-                        Open Full Guide
-                      </Link>
-                    </div>
+                <div className="shrink-0 border-t border-zinc-200/70 bg-white/95 p-4 shadow-[0_-18px_40px_rgba(24,24,27,0.08)] backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950/95 dark:shadow-[0_-18px_40px_rgba(0,0,0,0.35)]">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <button
+                      onClick={() => handlePlannerToggle(selectedAttraction)}
+                      className={`rounded-xl py-3.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.98] ${
+                        isInPlanner(selectedAttraction.id)
+                          ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700"
+                          : "bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+                      }`}
+                    >
+                      {isInPlanner(selectedAttraction.id)
+                        ? "Remove from Planner"
+                        : "Add to Planner"}
+                    </button>
+                    <Link
+                      href={`/attractions/${selectedAttraction.id}`}
+                      className="flex items-center justify-center rounded-xl border border-zinc-200 py-3.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
+                    >
+                      Open Full Guide
+                    </Link>
                   </div>
                 </div>
               </div>
