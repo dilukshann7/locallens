@@ -10,6 +10,7 @@ import {
   ShieldAlert,
 } from "lucide-react"
 import { ReviewsSection } from "@/components/reviews/reviews-section"
+import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { getActiveAttractionById } from "@/lib/attractions"
 import { getCurrentUserRecord } from "@/lib/auth/session"
 import { getReviewsByAttractionId } from "@/lib/reviews"
@@ -33,28 +34,31 @@ export default async function AttractionDetailPage({
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#eef3e4_0%,#f8f4ec_42%,#fcfcfa_100%)] px-4 py-8 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8 dark:bg-zinc-950 dark:text-zinc-50">
       <div className="mx-auto max-w-6xl space-y-8">
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-950"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Explorer
-          </Link>
-          <Link
-            href="/planner"
-            className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-transform hover:scale-[1.01] dark:bg-zinc-50 dark:text-zinc-950"
-          >
-            <CalendarDays className="h-4 w-4" />
-            Open Planner
-          </Link>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-4 py-2 text-sm font-medium text-zinc-700 backdrop-blur-xl transition-colors hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Explorer
+            </Link>
+            <Link
+              href="/planner"
+              className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2 text-sm font-medium text-white transition-transform hover:scale-[1.01] dark:bg-zinc-50 dark:text-zinc-950"
+            >
+              <CalendarDays className="h-4 w-4" />
+              Open Planner
+            </Link>
+          </div>
+          <ThemeToggle />
         </div>
 
-        <section className="overflow-hidden rounded-[2rem] border border-black/5 bg-white/80 shadow-[0_28px_90px_rgba(24,24,24,0.08)] backdrop-blur-xl">
+        <section className="overflow-hidden rounded-[2rem] border border-zinc-200/70 bg-white shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
           <div className="grid lg:grid-cols-[1.25fr_0.9fr]">
-            <div className="relative min-h-88 bg-zinc-100">
+            <div className="relative min-h-88 bg-zinc-100 dark:bg-zinc-900">
               {attraction.images?.[0] ? (
                 <Image
                   src={attraction.images[0]}
