@@ -89,7 +89,7 @@ export function ReviewForm({ attractionId, currentUserName }: ReviewFormProps) {
           })}
         </div>
         {state.fieldErrors?.rating && (
-          <p className="mt-2 text-sm text-rose-600">
+          <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">
             {state.fieldErrors.rating}
           </p>
         )}
@@ -116,7 +116,7 @@ export function ReviewForm({ attractionId, currentUserName }: ReviewFormProps) {
             className="mt-2"
           />
           {state.fieldErrors?.authorName && (
-            <p className="mt-2 text-sm text-rose-600">
+            <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">
               {state.fieldErrors.authorName}
             </p>
           )}
@@ -139,7 +139,9 @@ export function ReviewForm({ attractionId, currentUserName }: ReviewFormProps) {
           className="mt-2"
         />
         {state.fieldErrors?.body && (
-          <p className="mt-2 text-sm text-rose-600">{state.fieldErrors.body}</p>
+          <p className="mt-2 text-sm text-rose-600 dark:text-rose-400">
+            {state.fieldErrors.body}
+          </p>
         )}
       </div>
 

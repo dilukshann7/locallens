@@ -29,11 +29,11 @@ export function ReviewsSection({
 }: ReviewsSectionProps) {
   return (
     <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-      <Card className="rounded-lg border-black/5 bg-white/85 shadow-[0_18px_60px_rgba(24,24,24,0.07)] backdrop-blur-xl">
+      <Card className="rounded-lg border-zinc-200/70 bg-white shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-xl text-zinc-950">
+              <CardTitle className="text-xl text-zinc-950 dark:text-zinc-50">
                 Reviews & ratings
               </CardTitle>
               <CardDescription>
@@ -47,19 +47,19 @@ export function ReviewsSection({
         </CardHeader>
         <CardContent>
           {reviewCount > 0 && averageRating ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-950">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-100">
               <p className="text-3xl font-semibold">
                 {averageRating.toFixed(1)}
               </p>
               <div className="mt-2 flex items-center gap-2">
                 <RatingStars rating={averageRating} />
-                <span className="text-sm text-amber-900/75">
+                <span className="text-sm text-amber-900/75 dark:text-amber-100/75">
                   Average visitor rating
                 </span>
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+            <div className="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
               Be the first to leave a practical tip for this stop.
             </div>
           )}
@@ -78,12 +78,12 @@ export function ReviewsSection({
             <Card
               key={review.id}
               size="sm"
-              className="rounded-lg border-black/5 bg-white/85 shadow-sm backdrop-blur-xl"
+              className="rounded-lg border-zinc-200/70 bg-white shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950"
             >
               <CardHeader>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <CardTitle className="text-base text-zinc-950">
+                    <CardTitle className="text-base text-zinc-950 dark:text-zinc-50">
                       {review.authorName}
                     </CardTitle>
                     <CardDescription>
@@ -100,7 +100,7 @@ export function ReviewsSection({
               </CardHeader>
               {review.body && (
                 <CardContent>
-                  <p className="text-sm leading-6 whitespace-pre-line text-zinc-700">
+                  <p className="text-sm leading-6 whitespace-pre-line text-zinc-700 dark:text-zinc-300">
                     {review.body}
                   </p>
                 </CardContent>
@@ -108,8 +108,8 @@ export function ReviewsSection({
             </Card>
           ))
         ) : (
-          <Card className="rounded-lg border-dashed bg-white/70 shadow-none">
-            <CardContent className="py-10 text-center text-sm text-zinc-600">
+          <Card className="rounded-lg border-dashed border-zinc-200 bg-white shadow-none dark:border-zinc-800 dark:bg-zinc-950">
+            <CardContent className="py-10 text-center text-sm text-zinc-600 dark:text-zinc-300">
               No reviews yet. A short note about access, timing, or crowds can
               help the next traveller.
             </CardContent>

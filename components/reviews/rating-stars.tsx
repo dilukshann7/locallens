@@ -38,7 +38,7 @@ export function RatingStars({
               sizeClasses[size],
               isFilled
                 ? "fill-amber-400 text-amber-500"
-                : "fill-transparent text-zinc-300"
+                : "fill-transparent text-zinc-300 dark:text-zinc-700"
             )}
             aria-hidden="true"
           />
