@@ -235,7 +235,19 @@ export const attractionRelations = relations(attraction, ({ one, many }) => ({
     fields: [attraction.categoryId],
     references: [category.id],
   }),
+  reviews: many(review),
   itineraryItems: many(itineraryItem),
+}))
+
+export const reviewRelations = relations(review, ({ one }) => ({
+  attraction: one(attraction, {
+    fields: [review.attractionId],
+    references: [attraction.id],
+  }),
+  user: one(user, {
+    fields: [review.userId],
+    references: [user.id],
+  }),
 }))
 
 export const itineraryRelations = relations(itinerary, ({ one, many }) => ({

@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { attraction, category } from "@/lib/db/schema"
+import { attraction, category, review } from "@/lib/db/schema"
 
 export interface AttractionCategory {
   id: string
@@ -26,6 +26,13 @@ export interface AttractionRecord {
   isPopular: boolean
   isActive: boolean
   category?: AttractionCategory
+  averageRating?: number
+  reviewCount: number
+}
+
+interface ReviewSummary {
+  averageRating?: number
+  reviewCount: number
 }
 
 export interface CategoryRecord {
@@ -84,7 +91,10 @@ interface AttractionQueryRow {
   } | null
 }
 
-function normalizeAttraction(row: AttractionQueryRow): AttractionRecord {
+function normalizeAttraction(
+  row: AttractionQueryRow,
+  summary?: ReviewSummary
+): AttractionRecord {
   return {
     id: row.id,
     name: row.name,
@@ -111,7 +121,55 @@ function normalizeAttraction(row: AttractionQueryRow): AttractionRecord {
             slug: row.category.slug,
           }
         : undefined,
+    averageRating: summary?.averageRating,
+    reviewCount: summary?.reviewCount ?? 0,
   }
+}
+
+async function getReviewSummaries(
+  attractionIds: string[]
+): Promise<Map<string, ReviewSummary>> {
+  if (attractionIds.length === 0) {
+    return new Map()
+  }
+
+  const rows = await db
+    .select({
+      attractionId: review.attractionId,
+      rating: review.rating,
+    })
+    .from(review)
+    .where(inArray(review.attractionId, attractionIds))
+
+  const accumulators = new Map<
+    string,
+    {
+      ratingTotal: number
+      reviewCount: number
+    }
+  >()
+
+  for (const row of rows) {
+    const existing = accumulators.get(row.attractionId) ?? {
+      ratingTotal: 0,
+      reviewCount: 0,
+    }
+
+    existing.ratingTotal += row.rating
+    existing.reviewCount += 1
+    accumulators.set(row.attractionId, existing)
+  }
+
+  return new Map(
+    Array.from(accumulators.entries()).map(([attractionId, value]) => [
+      attractionId,
+      {
+        averageRating:
+          Math.round((value.ratingTotal / value.reviewCount) * 10) / 10,
+        reviewCount: value.reviewCount,
+      },
+    ])
+  )
 }
 
 export async function getActiveAttractions(): Promise<AttractionRecord[]> {
@@ -122,7 +180,9 @@ export async function getActiveAttractions(): Promise<AttractionRecord[]> {
     .where(eq(attraction.isActive, true))
     .orderBy(desc(attraction.isPopular), attraction.name)
 
-  return rows.map(normalizeAttraction)
+  const summaries = await getReviewSummaries(rows.map((row) => row.id))
+
+  return rows.map((row) => normalizeAttraction(row, summaries.get(row.id)))
 }
 
 export async function getActiveAttractionsByIds(
@@ -140,9 +200,10 @@ export async function getActiveAttractionsByIds(
       and(inArray(attraction.id, attractionIds), eq(attraction.isActive, true))
     )
 
+  const summaries = await getReviewSummaries(rows.map((row) => row.id))
   const attractionsById = new Map(
     rows.map((row) => {
-      const normalized = normalizeAttraction(row)
+      const normalized = normalizeAttraction(row, summaries.get(row.id))
       return [normalized.id, normalized] as const
     })
   )
@@ -162,7 +223,13 @@ export async function getActiveAttractionById(
     .where(and(eq(attraction.id, id), eq(attraction.isActive, true)))
     .then((rows) => rows[0] ?? null)
 
-  return row ? normalizeAttraction(row) : null
+  if (!row) {
+    return null
+  }
+
+  const summaries = await getReviewSummaries([row.id])
+
+  return normalizeAttraction(row, summaries.get(row.id))
 }
 
 export async function getCategories(): Promise<CategoryRecord[]> {
