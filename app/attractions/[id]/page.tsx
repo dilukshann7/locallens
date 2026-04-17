@@ -9,7 +9,10 @@ import {
   MapPin,
   ShieldAlert,
 } from "lucide-react"
+import { ReviewsSection } from "@/components/reviews/reviews-section"
 import { getActiveAttractionById } from "@/lib/attractions"
+import { getCurrentUserRecord } from "@/lib/auth/session"
+import { getReviewsByAttractionId } from "@/lib/reviews"
 
 export const dynamic = "force-dynamic"
 
@@ -19,7 +22,11 @@ export default async function AttractionDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const attraction = await getActiveAttractionById(id)
+  const [attraction, reviews, currentUser] = await Promise.all([
+    getActiveAttractionById(id),
+    getReviewsByAttractionId(id),
+    getCurrentUserRecord(),
+  ])
 
   if (!attraction) {
     notFound()
@@ -216,6 +223,14 @@ export default async function AttractionDetailPage({
             )}
           </aside>
         </section>
+
+        <ReviewsSection
+          attractionId={attraction.id}
+          reviews={reviews}
+          averageRating={attraction.averageRating}
+          reviewCount={attraction.reviewCount}
+          currentUserName={currentUser?.name}
+        />
       </div>
     </main>
   )
