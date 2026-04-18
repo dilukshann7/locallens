@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto"
-import { and, desc, eq, inArray, sql } from "drizzle-orm"
+import { and, count, desc, eq, inArray } from "drizzle-orm"
 import { getActiveAttractionsByIds } from "@/lib/attractions"
 import { db } from "@/lib/db"
 import { attraction, itinerary, itineraryItem } from "@/lib/db/schema"
@@ -253,7 +253,7 @@ export async function listTripsForUser(
       notes: itinerary.notes,
       createdAt: itinerary.createdAt,
       updatedAt: itinerary.updatedAt,
-      stopCount: sql<number>`count(${itineraryItem.id})`,
+      stopCount: count(itineraryItem.id),
     })
     .from(itinerary)
     .leftJoin(itineraryItem, eq(itineraryItem.itineraryId, itinerary.id))

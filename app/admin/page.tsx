@@ -1,54 +1,57 @@
 import { db } from "@/lib/db"
-import { attraction, category, itinerary, user } from "@/lib/db/schema"
-import { eq, sql } from "drizzle-orm"
+import { attraction, itinerary, review, user } from "@/lib/db/schema"
+import { count, desc, eq } from "drizzle-orm"
 import {
   MapPin,
   Users,
   CalendarDays,
-  TrendingUp,
   Plus,
   ArrowUpRight,
+  Star,
 } from "lucide-react"
 import Link from "next/link"
+import { StatCard } from "@/components/admin/stat-card"
+
+export const dynamic = "force-dynamic"
 
 export default async function AdminDashboard() {
-  const [attractionsCount, categoriesCount, itinerariesCount, usersCount] =
+  const [attractionsCount, reviewsCount, usersCount, itinerariesCount] =
     await Promise.all([
       db
-        .select({ count: sql<number>`count(*)` })
+        .select({ value: count() })
         .from(attraction)
         .where(eq(attraction.isActive, true)),
-      db.select({ count: sql<number>`count(*)` }).from(category),
-      db.select({ count: sql<number>`count(*)` }).from(itinerary),
-      db.select({ count: sql<number>`count(*)` }).from(user),
+      db.select({ value: count() }).from(review),
+      db.select({ value: count() }).from(user),
+      db.select({ value: count() }).from(itinerary),
     ])
 
   const recentAttractions = await db
     .select()
     .from(attraction)
-    .orderBy(attraction.createdAt)
+    .orderBy(desc(attraction.createdAt))
     .limit(5)
 
   const stats = [
     {
       label: "Total Attractions",
-      value: attractionsCount[0]?.count || 0,
+      value: attractionsCount[0]?.value || 0,
       icon: MapPin,
     },
     {
-      label: "Categories",
-      value: categoriesCount[0]?.count || 0,
-      icon: TrendingUp,
+      label: "Total Reviews",
+      value: reviewsCount[0]?.value || 0,
+      icon: Star,
     },
     {
-      label: "Itineraries",
-      value: itinerariesCount[0]?.count || 0,
-      icon: CalendarDays,
-    },
-    {
-      label: "Total Users",
-      value: usersCount[0]?.count || 0,
+      label: "Registered Users",
+      value: usersCount[0]?.value || 0,
       icon: Users,
+    },
+    {
+      label: "Saved Itineraries",
+      value: itinerariesCount[0]?.value || 0,
+      icon: CalendarDays,
     },
   ]
 
@@ -72,24 +75,13 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <div
+        {stats.map((stat) => (
+          <StatCard
             key={stat.label}
-            className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 transition-all hover:border-zinc-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50 dark:hover:border-zinc-700"
-            style={{ animationDelay: `${i * 50}ms` }}
-          >
-            <div className="flex items-center justify-between">
-              <stat.icon className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
-            </div>
-            <div className="mt-4">
-              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {stat.label}
-              </p>
-              <p className="mt-1 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                {stat.value}
-              </p>
-            </div>
-          </div>
+            label={stat.label}
+            value={stat.value}
+            icon={stat.icon}
+          />
         ))}
       </div>
 
