@@ -29,6 +29,13 @@
       "when": 1776499288093,
       "tag": "0003_attraction_images_and_details",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776512442625,
+      "tag": "0004_remove_cost_fields",
+      "breakpoints": true
     }
   ]
 }

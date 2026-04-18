@@ -143,7 +143,6 @@ export const attraction = pgTable(
     }),
     openingHours: text("opening_hours"),
     travelTips: text("travel_tips"),
-    estimatedCostLkr: integer("estimated_cost_lkr"),
     transportInfo: text("transport_info"),
     accessibilityInfo: text("accessibility_info"),
     crowdLevel: text("crowd_level"),

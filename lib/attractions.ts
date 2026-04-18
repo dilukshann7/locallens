@@ -23,7 +23,6 @@ export interface AttractionRecord {
   primaryImageUrl?: string
   openingHours?: string
   travelTips?: string
-  estimatedCostLkr?: number
   transportInfo?: string
   accessibilityInfo?: string
   crowdLevel?: string
@@ -65,7 +64,6 @@ const attractionSelect = {
   distanceFromBeragalaKm: attraction.distanceFromBeragalaKm,
   openingHours: attraction.openingHours,
   travelTips: attraction.travelTips,
-  estimatedCostLkr: attraction.estimatedCostLkr,
   transportInfo: attraction.transportInfo,
   accessibilityInfo: attraction.accessibilityInfo,
   crowdLevel: attraction.crowdLevel,
@@ -96,7 +94,6 @@ interface AttractionQueryRow {
   distanceFromBeragalaKm: string | null
   openingHours: string | null
   travelTips: string | null
-  estimatedCostLkr: number | null
   transportInfo: string | null
   accessibilityInfo: string | null
   crowdLevel: string | null
@@ -134,7 +131,6 @@ function normalizeAttraction(
     primaryImageUrl: images[0],
     openingHours: row.openingHours ?? undefined,
     travelTips: row.travelTips ?? undefined,
-    estimatedCostLkr: row.estimatedCostLkr ?? undefined,
     transportInfo: row.transportInfo ?? undefined,
     accessibilityInfo: row.accessibilityInfo ?? undefined,
     crowdLevel: row.crowdLevel ?? undefined,

@@ -1,0 +1,1 @@
+ALTER TABLE "attraction" DROP COLUMN "estimated_cost_lkr";

@@ -11,7 +11,6 @@ export interface AttractionMutationInput {
   distanceFromBeragalaKm: string | null
   openingHours: string | null
   travelTips: string | null
-  estimatedCostLkr: number | null
   transportInfo: string | null
   accessibilityInfo: string | null
   crowdLevel: string | null
@@ -225,12 +224,6 @@ export function validateAttractionPayload(
   )
   if ("error" in duration) return { success: false, error: duration.error }
 
-  const cost = getInteger(body, "estimatedCostLkr", "Estimated cost", {
-    min: 0,
-    max: 1000000,
-  })
-  if ("error" in cost) return { success: false, error: cost.error }
-
   return {
     success: true,
     data: {
@@ -246,7 +239,6 @@ export function validateAttractionPayload(
       distanceFromBeragalaKm: distance.value,
       openingHours: getNullableString(body, "openingHours", 500),
       travelTips: getNullableString(body, "travelTips", 2000),
-      estimatedCostLkr: cost.value,
       transportInfo: getNullableString(body, "transportInfo", 2000),
       accessibilityInfo: getNullableString(body, "accessibilityInfo", 2000),
       crowdLevel: getNullableString(body, "crowdLevel", 500),
