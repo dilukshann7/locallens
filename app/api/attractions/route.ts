@@ -1,7 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { attraction } from "@/lib/db/schema"
+import { attraction, attractionImage } from "@/lib/db/schema"
 import { isCurrentUserAdmin } from "@/lib/auth/session"
+import { validateAttractionPayload } from "@/lib/attraction-validation"
+
+async function insertAttractionImages(attractionId: string, urls: string[]) {
+  if (urls.length === 0) {
+    return
+  }
+
+  await db.insert(attractionImage).values(
+    urls.map((url, index) => ({
+      id: crypto.randomUUID(),
+      attractionId,
+      url,
+      altText: null,
+      isPrimary: index === 0,
+      position: index,
+    }))
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +27,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
+    const validation = validateAttractionPayload(await request.json())
 
-    const id =
-      body.id || `attr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const body = validation.data
+    const id = body.id || crypto.randomUUID()
 
     await db.insert(attraction).values({
       id,
       name: body.name,
+      slug: body.slug,
       description: body.description,
       shortDescription: body.shortDescription,
       categoryId: body.categoryId,
@@ -24,18 +47,25 @@ export async function POST(request: NextRequest) {
       longitude: body.longitude,
       address: body.address,
       distanceFromBeragalaKm: body.distanceFromBeragalaKm,
-      images: body.images,
+      openingHours: body.openingHours,
+      travelTips: body.travelTips,
+      transportInfo: body.transportInfo,
+      accessibilityInfo: body.accessibilityInfo,
+      crowdLevel: body.crowdLevel,
       suggestedVisitDurationMinutes: body.suggestedVisitDurationMinutes,
       bestTimeToVisit: body.bestTimeToVisit,
       weatherNote: body.weatherNote,
       safetyNote: body.safetyNote,
-      isPopular: body.isPopular || false,
+      disclaimer: body.disclaimer,
+      isPopular: body.isPopular,
       isActive: true,
     })
 
-    return NextResponse.json({ id, success: true })
+    await insertAttractionImages(id, body.images)
+
+    return NextResponse.json({ id, success: true }, { status: 201 })
   } catch (error) {
-    console.error("Create error:", error)
+    console.error("Create attraction error:", error)
     return NextResponse.json(
       { error: "Failed to create attraction" },
       { status: 500 }
