@@ -2,24 +2,13 @@
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import dynamic from "next/dynamic"
 import { AttractionCard } from "@/components/explorer/attraction-card"
 import { CategoryFilter } from "@/components/explorer/category-filter"
 import { SearchInput } from "@/components/explorer/search-input"
-import { DayPlanner, type PlannerItem } from "@/components/planner/day-planner"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import {
   CalendarDays,
-  Map as MapIcon,
-  LayoutGrid,
   MapPin,
   Clock,
   Info,
@@ -29,21 +18,6 @@ import {
 import Image from "next/image"
 import { useDayPlanner } from "@/hooks/use-day-planner"
 import type { AttractionRecord, CategoryRecord } from "@/lib/attractions"
-
-const AttractionMap = dynamic(
-  () =>
-    import("@/components/explorer/attraction-map").then(
-      (mod) => mod.AttractionMap
-    ),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="relative z-0 h-[calc(100vh-250px)] min-h-125 overflow-hidden rounded-3xl border border-zinc-200 shadow-sm dark:border-zinc-800">
-        <Skeleton className="h-full w-full rounded-none" />
-      </div>
-    ),
-  }
-)
 
 interface TouristExplorerProps {
   attractions: AttractionRecord[]
@@ -59,18 +33,9 @@ export function TouristExplorer({
   const deferredSearchQuery = useDeferredValue(searchQuery)
   const [selectedAttraction, setSelectedAttraction] =
     useState<AttractionRecord | null>(null)
-  const [viewMode, setViewMode] = useState<"grid" | "map">("grid")
   const [isScrolled, setIsScrolled] = useState(false)
-  const {
-    plannerItems,
-    isInPlanner,
-    addToPlanner,
-    removeFromPlanner,
-    reorderPlanner,
-    clearPlanner,
-    plannerMode,
-    plannerSummary,
-  } = useDayPlanner()
+  const { plannerItems, isInPlanner, addToPlanner, removeFromPlanner } =
+    useDayPlanner()
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20)
@@ -107,10 +72,6 @@ export function TouristExplorer({
     removeFromPlanner(item.id)
   }
 
-  const handleReorder = (items: PlannerItem[]) => {
-    reorderPlanner(items)
-  }
-
   const handlePlannerToggle = (attraction: AttractionRecord) => {
     if (isInPlanner(attraction.id)) {
       removeFromPlanner(attraction.id)
@@ -136,83 +97,18 @@ export function TouristExplorer({
             </div>
 
             <div className="flex items-center justify-between gap-3 sm:justify-end">
-              <Link
-                href="/map"
-                className="hidden rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900 md:inline-flex dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
-              >
-                Map
-              </Link>
               <ThemeToggle />
-              <div className="flex items-center rounded-full bg-zinc-100 p-1 dark:bg-zinc-900">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-                    viewMode === "grid"
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-                  }`}
-                >
-                  <LayoutGrid className="mr-1.5 h-4 w-4" />
-                  Grid
-                </button>
-                <button
-                  onClick={() => setViewMode("map")}
-                  className={`flex items-center justify-center rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-                    viewMode === "map"
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-                  }`}
-                >
-                  <MapIcon className="mr-1.5 h-4 w-4" />
-                  Map
-                </button>
-              </div>
-
-              <Sheet>
-                <SheetTrigger asChild>
-                  <button className="relative flex items-center justify-center rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-zinc-800 active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200">
-                    <CalendarDays className="mr-2 h-4 w-4" />
-                    Planner
-                    {plannerItems.length > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-zinc-950">
-                        {plannerItems.length}
-                      </span>
-                    )}
-                  </button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:max-w-md">
-                  <SheetHeader className="space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <SheetTitle>Your Itinerary</SheetTitle>
-                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                          {plannerSummary}
-                        </p>
-                      </div>
-                      <Link
-                        href="/planner"
-                        className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
-                      >
-                        Open Full Planner
-                      </Link>
-                    </div>
-                  </SheetHeader>
-                  <div className="mt-6 h-full">
-                    <DayPlanner
-                      items={plannerItems}
-                      onReorder={handleReorder}
-                      onRemove={handleRemoveFromPlanner}
-                      onClear={clearPlanner}
-                    />
-                  </div>
-                </SheetContent>
-              </Sheet>
-
               <Link
                 href="/planner"
-                className="hidden rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900 md:inline-flex dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
+                className="relative inline-flex rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-transform hover:bg-zinc-800 active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
               >
-                {plannerMode === "account" ? "Synced Plan" : "Full Plan"}
+                <CalendarDays className="mr-2 h-4 w-4" />
+                Planner
+                {plannerItems.length > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-zinc-950">
+                    {plannerItems.length}
+                  </span>
+                )}
               </Link>
             </div>
           </div>
@@ -406,59 +302,47 @@ export function TouristExplorer({
           </SheetContent>
         </Sheet>
 
-        {viewMode === "grid" ? (
-          <>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-                Explore Places
-              </h2>
-              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {filteredAttractions.length} destinations
-              </p>
-            </div>
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Explore Places
+          </h2>
+          <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            {filteredAttractions.length} destinations
+          </p>
+        </div>
 
-            {filteredAttractions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-200 bg-white py-32 text-center dark:border-zinc-800 dark:bg-zinc-950">
-                <p className="text-lg font-medium text-zinc-900 dark:text-zinc-50">
-                  No matches found
-                </p>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  Try adjusting your search or filters to find what you&apos;re
-                  looking for.
-                </p>
-                <button
-                  onClick={() => {
-                    setSelectedCategory(null)
-                    setSearchQuery("")
-                  }}
-                  className="mt-6 font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredAttractions.map((attraction, index) => (
-                  <AttractionCard
-                    key={attraction.id}
-                    attraction={attraction}
-                    isInPlanner={isInPlanner(attraction.id)}
-                    onAddToPlanner={handleAddToPlanner}
-                    onRemoveFromPlanner={handleRemoveFromPlanner}
-                    onSelect={setSelectedAttraction}
-                    index={index}
-                  />
-                ))}
-              </div>
-            )}
-          </>
+        {filteredAttractions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-200 bg-white py-32 text-center dark:border-zinc-800 dark:bg-zinc-950">
+            <p className="text-lg font-medium text-zinc-900 dark:text-zinc-50">
+              No matches found
+            </p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Try adjusting your search or filters to find what you&apos;re
+              looking for.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedCategory(null)
+                setSearchQuery("")
+              }}
+              className="mt-6 font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+            >
+              Clear all filters
+            </button>
+          </div>
         ) : (
-          <div className="relative z-0 h-[calc(100vh-250px)] min-h-125 overflow-hidden rounded-3xl border border-zinc-200 shadow-sm dark:border-zinc-800">
-            <AttractionMap
-              attractions={filteredAttractions}
-              selectedAttraction={selectedAttraction}
-              onSelectAttraction={setSelectedAttraction}
-            />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredAttractions.map((attraction, index) => (
+              <AttractionCard
+                key={attraction.id}
+                attraction={attraction}
+                isInPlanner={isInPlanner(attraction.id)}
+                onAddToPlanner={handleAddToPlanner}
+                onRemoveFromPlanner={handleRemoveFromPlanner}
+                onSelect={setSelectedAttraction}
+                index={index}
+              />
+            ))}
           </div>
         )}
       </div>
