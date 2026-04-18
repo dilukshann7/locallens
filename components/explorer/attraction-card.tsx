@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Clock, Plus, Check, Star, Wallet } from "lucide-react"
+import { MapPin, Clock, Plus, Check, Star } from "lucide-react"
 import Image from "next/image"
 import type { AttractionRecord } from "@/lib/attractions"
 

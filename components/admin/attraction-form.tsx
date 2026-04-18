@@ -35,7 +35,6 @@ interface Attraction {
   distanceFromBeragalaKm?: string
   openingHours?: string
   travelTips?: string
-  estimatedCostLkr?: number
   transportInfo?: string
   accessibilityInfo?: string
   crowdLevel?: string
@@ -178,7 +177,6 @@ export function AttractionForm({
     distanceFromBeragalaKm: attraction?.distanceFromBeragalaKm || "",
     openingHours: attraction?.openingHours || "",
     travelTips: attraction?.travelTips || "",
-    estimatedCostLkr: attraction?.estimatedCostLkr?.toString() || "",
     transportInfo: attraction?.transportInfo || "",
     accessibilityInfo: attraction?.accessibilityInfo || "",
     crowdLevel: attraction?.crowdLevel || "",
@@ -276,9 +274,6 @@ export function AttractionForm({
         distanceFromBeragalaKm: formData.distanceFromBeragalaKm || null,
         openingHours: formData.openingHours || null,
         travelTips: formData.travelTips || null,
-        estimatedCostLkr: formData.estimatedCostLkr
-          ? parseInt(formData.estimatedCostLkr, 10)
-          : null,
         transportInfo: formData.transportInfo || null,
         accessibilityInfo: formData.accessibilityInfo || null,
         crowdLevel: formData.crowdLevel || null,
@@ -533,19 +528,6 @@ export function AttractionForm({
               })
             }
             placeholder="120"
-          />
-
-          <InputField
-            label="Estimated Cost (LKR)"
-            id="estimatedCost"
-            type="number"
-            min={0}
-            step={50}
-            value={formData.estimatedCostLkr}
-            onChange={(e) =>
-              setFormData({ ...formData, estimatedCostLkr: e.target.value })
-            }
-            placeholder="1500"
           />
 
           <InputField

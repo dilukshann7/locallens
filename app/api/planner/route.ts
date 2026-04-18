@@ -76,10 +76,6 @@ function getPlannerPayload(body: unknown): PlannerState | null {
                 typeof item.primaryImageUrl === "string"
                   ? item.primaryImageUrl
                   : undefined,
-              estimatedCostLkr:
-                typeof item.estimatedCostLkr === "number"
-                  ? item.estimatedCostLkr
-                  : undefined,
               suggestedVisitDurationMinutes:
                 typeof item.suggestedVisitDurationMinutes === "number"
                   ? item.suggestedVisitDurationMinutes

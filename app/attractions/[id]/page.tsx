@@ -115,16 +115,6 @@ export default async function AttractionDetailPage({
                       : "Flexible"}
                   </p>
                 </div>
-                {typeof attraction.estimatedCostLkr === "number" && (
-                  <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
-                    <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase dark:text-zinc-400">
-                      Estimated Cost
-                    </p>
-                    <p className="mt-3 text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
-                      LKR {attraction.estimatedCostLkr.toLocaleString()}
-                    </p>
-                  </div>
-                )}
               </div>
 
               {attraction.address && (
