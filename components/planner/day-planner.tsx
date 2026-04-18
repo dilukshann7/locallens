@@ -20,6 +20,7 @@ import {
   Mountain,
   Route,
   StickyNote,
+  Wallet,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -126,6 +127,10 @@ export function DayPlanner({
     (acc, item) => acc + item.travelMinutes,
     0
   )
+  const totalCost = items.reduce(
+    (acc, item) => acc + (item.estimatedCostLkr ?? 0),
+    0
+  )
   const finishTime =
     schedule.length > 0
       ? formatTimeLabel(schedule[schedule.length - 1]!.departureMinutes)
@@ -169,6 +174,10 @@ export function DayPlanner({
               <Route className="h-3.5 w-3.5" />
               {Math.floor(totalTravelDuration / 60)}h {totalTravelDuration % 60}
               m transit
+            </span>
+            <span className="flex items-center gap-1.5 rounded-md bg-zinc-100 px-2.5 py-1 dark:bg-zinc-800/50">
+              <Wallet className="h-3.5 w-3.5" />
+              LKR {totalCost.toLocaleString()}
             </span>
             <span className="flex items-center gap-1.5 rounded-md bg-zinc-100 px-2.5 py-1 font-semibold text-emerald-700 dark:bg-zinc-800/50 dark:text-emerald-400">
               <CalendarDays className="h-3.5 w-3.5" />
@@ -297,6 +306,14 @@ export function DayPlanner({
                                   </span>
                                 </>
                               )}
+                              {typeof item.estimatedCostLkr === "number" && (
+                                <>
+                                  <span className="hidden h-1 w-1 rounded-full bg-zinc-300 sm:block dark:bg-zinc-700" />
+                                  <span>
+                                    LKR {item.estimatedCostLkr.toLocaleString()}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </div>
 
@@ -331,7 +348,7 @@ export function DayPlanner({
                                       ),
                                     })
                                   }
-                                  className="emil-transition h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                                  className="emil-transition mt-1 h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                                 />
                               </label>
 
@@ -345,7 +362,7 @@ export function DayPlanner({
                                         .value as PlannerStop["transportMode"],
                                     })
                                   }
-                                  className="emil-transition h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                                  className="emil-transition mt-1 h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                                 >
                                   {transportModes.map((transportMode) => (
                                     <option
@@ -376,7 +393,7 @@ export function DayPlanner({
                                       ),
                                     })
                                   }
-                                  className="emil-transition h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                                  className="emil-transition mt-1 h-10 w-full rounded-xl border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                                 />
                               </label>
                             </div>
@@ -395,7 +412,7 @@ export function DayPlanner({
                                 }
                                 rows={2}
                                 placeholder="Add timing reminders, ticket notes, food stops, or what to do here..."
-                                className="emil-transition w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                                className="emil-transition mt-1 w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                               />
                             </label>
                           </div>
