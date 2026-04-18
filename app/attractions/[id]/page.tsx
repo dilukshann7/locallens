@@ -7,11 +7,14 @@ import {
   Clock3,
   CloudRain,
   MapPin,
+  Route,
   ShieldAlert,
+  Users,
+  Accessibility,
 } from "lucide-react"
 import { ReviewsSection } from "@/components/reviews/reviews-section"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { getActiveAttractionById } from "@/lib/attractions"
+import { getActiveAttractionBySlugOrId } from "@/lib/attractions"
 import { getCurrentUserRecord } from "@/lib/auth/session"
 import { getReviewsByAttractionId } from "@/lib/reviews"
 
@@ -24,7 +27,7 @@ export default async function AttractionDetailPage({
 }) {
   const { id } = await params
   const [attraction, reviews, currentUser] = await Promise.all([
-    getActiveAttractionById(id),
+    getActiveAttractionBySlugOrId(id),
     getReviewsByAttractionId(id),
     getCurrentUserRecord(),
   ])
@@ -59,9 +62,9 @@ export default async function AttractionDetailPage({
         <section className="overflow-hidden rounded-[2rem] border border-zinc-200/70 bg-white shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
           <div className="grid lg:grid-cols-[1.25fr_0.9fr]">
             <div className="relative min-h-88 bg-zinc-100 dark:bg-zinc-900">
-              {attraction.images?.[0] ? (
+              {attraction.primaryImageUrl ? (
                 <Image
-                  src={attraction.images[0]}
+                  src={attraction.primaryImageUrl}
                   alt={attraction.name}
                   fill
                   className="object-cover"
@@ -112,6 +115,16 @@ export default async function AttractionDetailPage({
                       : "Flexible"}
                   </p>
                 </div>
+                {typeof attraction.estimatedCostLkr === "number" && (
+                  <div className="rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                    <p className="text-xs font-semibold tracking-[0.22em] text-zinc-500 uppercase dark:text-zinc-400">
+                      Estimated Cost
+                    </p>
+                    <p className="mt-3 text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+                      LKR {attraction.estimatedCostLkr.toLocaleString()}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {attraction.address && (
@@ -145,6 +158,22 @@ export default async function AttractionDetailPage({
                   </div>
                 </div>
               )}
+
+              {attraction.openingHours && (
+                <div className="rounded-[1.4rem] border border-zinc-200/80 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                  <div className="flex items-start gap-3">
+                    <CalendarDays className="mt-0.5 h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
+                        Opening hours
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                        {attraction.openingHours}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -162,22 +191,89 @@ export default async function AttractionDetailPage({
           </article>
 
           <aside className="space-y-6">
-            {(attraction.safetyNote || attraction.weatherNote) && (
+            {(attraction.travelTips ||
+              attraction.transportInfo ||
+              attraction.accessibilityInfo ||
+              attraction.crowdLevel) && (
+              <section className="rounded-[2rem] border border-zinc-200/70 bg-white p-6 shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
+                <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
+                  Local Planning Notes
+                </p>
+                <div className="mt-5 space-y-4">
+                  {attraction.travelTips && (
+                    <div className="rounded-[1.4rem] border border-emerald-200/80 bg-emerald-50/80 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/20">
+                      <p className="text-sm font-medium text-emerald-900 dark:text-emerald-200">
+                        Travel tips
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-emerald-800/80 dark:text-emerald-200/80">
+                        {attraction.travelTips}
+                      </p>
+                    </div>
+                  )}
+
+                  {attraction.transportInfo && (
+                    <div className="flex gap-3 rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                      <Route className="mt-0.5 h-5 w-5 text-zinc-500" />
+                      <div>
+                        <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
+                          Transport
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                          {attraction.transportInfo}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {attraction.accessibilityInfo && (
+                    <div className="flex gap-3 rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                      <Accessibility className="mt-0.5 h-5 w-5 text-zinc-500" />
+                      <div>
+                        <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
+                          Accessibility
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                          {attraction.accessibilityInfo}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {attraction.crowdLevel && (
+                    <div className="flex gap-3 rounded-[1.4rem] border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
+                      <Users className="mt-0.5 h-5 w-5 text-zinc-500" />
+                      <div>
+                        <p className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
+                          Crowd level
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                          {attraction.crowdLevel}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {(attraction.disclaimer ||
+              attraction.safetyNote ||
+              attraction.weatherNote) && (
               <section className="rounded-[2rem] border border-zinc-200/70 bg-white p-6 shadow-sm backdrop-blur-xl dark:border-zinc-800/70 dark:bg-zinc-950">
                 <p className="text-xs font-semibold tracking-[0.24em] text-zinc-500 uppercase dark:text-zinc-400">
                   Field Notes
                 </p>
                 <div className="mt-5 space-y-4">
-                  {attraction.safetyNote && (
+                  {(attraction.disclaimer || attraction.safetyNote) && (
                     <div className="rounded-[1.4rem] border border-rose-200/80 bg-rose-50/80 p-4 dark:border-rose-900/40 dark:bg-rose-950/20">
                       <div className="flex items-start gap-3">
                         <ShieldAlert className="mt-0.5 h-5 w-5 text-rose-600 dark:text-rose-400" />
                         <div>
                           <p className="text-sm font-medium text-rose-900 dark:text-rose-200">
-                            Safety note
+                            Safety disclaimer
                           </p>
                           <p className="mt-1 text-sm leading-6 text-rose-800/80 dark:text-rose-200/80">
-                            {attraction.safetyNote}
+                            {attraction.disclaimer ?? attraction.safetyNote}
                           </p>
                         </div>
                       </div>
