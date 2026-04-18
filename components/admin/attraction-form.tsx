@@ -25,6 +25,7 @@ import Image from "next/image"
 interface Attraction {
   id?: string
   name: string
+  slug?: string
   description: string
   shortDescription?: string
   categoryId?: string
@@ -32,11 +33,18 @@ interface Attraction {
   longitude: string
   address?: string
   distanceFromBeragalaKm?: string
+  openingHours?: string
+  travelTips?: string
+  estimatedCostLkr?: number
+  transportInfo?: string
+  accessibilityInfo?: string
+  crowdLevel?: string
   images?: string[]
   suggestedVisitDurationMinutes?: number
   bestTimeToVisit?: string
   weatherNote?: string
   safetyNote?: string
+  disclaimer?: string
   isPopular?: boolean
 }
 
@@ -105,6 +113,15 @@ const TextAreaField = ({
   </div>
 )
 
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
 function Section({
   title,
   icon: Icon,
@@ -151,6 +168,7 @@ export function AttractionForm({
 
   const [formData, setFormData] = useState({
     name: attraction?.name || "",
+    slug: attraction?.slug || "",
     description: attraction?.description || "",
     shortDescription: attraction?.shortDescription || "",
     categoryId: attraction?.categoryId || "",
@@ -158,11 +176,18 @@ export function AttractionForm({
     longitude: attraction?.longitude || "",
     address: attraction?.address || "",
     distanceFromBeragalaKm: attraction?.distanceFromBeragalaKm || "",
+    openingHours: attraction?.openingHours || "",
+    travelTips: attraction?.travelTips || "",
+    estimatedCostLkr: attraction?.estimatedCostLkr?.toString() || "",
+    transportInfo: attraction?.transportInfo || "",
+    accessibilityInfo: attraction?.accessibilityInfo || "",
+    crowdLevel: attraction?.crowdLevel || "",
     suggestedVisitDurationMinutes:
       attraction?.suggestedVisitDurationMinutes?.toString() || "",
     bestTimeToVisit: attraction?.bestTimeToVisit || "",
     weatherNote: attraction?.weatherNote || "",
     safetyNote: attraction?.safetyNote || "",
+    disclaimer: attraction?.disclaimer || "",
     isPopular: attraction?.isPopular || false,
   })
 
@@ -244,13 +269,23 @@ export function AttractionForm({
       const payload = {
         id: targetId,
         ...formData,
+        slug: formData.slug || slugify(formData.name),
         categoryId: formData.categoryId || null,
         latitude: formData.latitude || null,
         longitude: formData.longitude || null,
         distanceFromBeragalaKm: formData.distanceFromBeragalaKm || null,
-        suggestedVisitDurationMinutes: formData.suggestedVisitDurationMinutes
-          ? parseInt(formData.suggestedVisitDurationMinutes)
+        openingHours: formData.openingHours || null,
+        travelTips: formData.travelTips || null,
+        estimatedCostLkr: formData.estimatedCostLkr
+          ? parseInt(formData.estimatedCostLkr, 10)
           : null,
+        transportInfo: formData.transportInfo || null,
+        accessibilityInfo: formData.accessibilityInfo || null,
+        crowdLevel: formData.crowdLevel || null,
+        suggestedVisitDurationMinutes: formData.suggestedVisitDurationMinutes
+          ? parseInt(formData.suggestedVisitDurationMinutes, 10)
+          : null,
+        disclaimer: formData.disclaimer || null,
         images: images.length > 0 ? images : null,
         isPopular: formData.isPopular,
       }
@@ -271,7 +306,10 @@ export function AttractionForm({
         router.push("/admin/attractions")
         router.refresh()
       } else {
-        alert("Failed to save attraction")
+        const result = (await response.json().catch(() => null)) as {
+          error?: string
+        } | null
+        alert(result?.error ?? "Failed to save attraction")
       }
     } catch (error) {
       console.error("Save failed:", error)
@@ -289,9 +327,27 @@ export function AttractionForm({
             label="Name *"
             id="name"
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onChange={(e) =>
+              setFormData((current) => ({
+                ...current,
+                name: e.target.value,
+                slug: current.slug || slugify(e.target.value),
+              }))
+            }
             required
             placeholder="E.g., Bambarakanda Falls"
+          />
+
+          <InputField
+            label="Slug *"
+            id="slug"
+            value={formData.slug}
+            onChange={(e) =>
+              setFormData({ ...formData, slug: slugify(e.target.value) })
+            }
+            required
+            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+            placeholder="bambarakanda-falls"
           />
 
           <InputField
@@ -467,6 +523,8 @@ export function AttractionForm({
             label="Suggested Duration (mins)"
             id="duration"
             type="number"
+            min={15}
+            step={15}
             value={formData.suggestedVisitDurationMinutes}
             onChange={(e) =>
               setFormData({
@@ -475,6 +533,19 @@ export function AttractionForm({
               })
             }
             placeholder="120"
+          />
+
+          <InputField
+            label="Estimated Cost (LKR)"
+            id="estimatedCost"
+            type="number"
+            min={0}
+            step={50}
+            value={formData.estimatedCostLkr}
+            onChange={(e) =>
+              setFormData({ ...formData, estimatedCostLkr: e.target.value })
+            }
+            placeholder="1500"
           />
 
           <InputField
@@ -488,6 +559,16 @@ export function AttractionForm({
           />
 
           <InputField
+            label="Opening Hours"
+            id="openingHours"
+            value={formData.openingHours}
+            onChange={(e) =>
+              setFormData({ ...formData, openingHours: e.target.value })
+            }
+            placeholder="Daily, 6:00 AM - 5:30 PM"
+          />
+
+          <InputField
             label="Weather Note"
             id="weather"
             value={formData.weatherNote}
@@ -495,6 +576,16 @@ export function AttractionForm({
               setFormData({ ...formData, weatherNote: e.target.value })
             }
             placeholder="Can be very misty during rainy season"
+          />
+
+          <InputField
+            label="Crowd Level"
+            id="crowdLevel"
+            value={formData.crowdLevel}
+            onChange={(e) =>
+              setFormData({ ...formData, crowdLevel: e.target.value })
+            }
+            placeholder="Low on weekday mornings"
           />
 
           <InputField
@@ -507,6 +598,48 @@ export function AttractionForm({
             placeholder="Beware of leeches during wet weather"
           />
         </div>
+
+        <div className="mt-6 space-y-6">
+          <TextAreaField
+            label="Travel Tips"
+            id="travelTips"
+            value={formData.travelTips}
+            onChange={(e) =>
+              setFormData({ ...formData, travelTips: e.target.value })
+            }
+            placeholder="Bring water, start before the mist rolls in, carry cash for small vendors..."
+          />
+
+          <TextAreaField
+            label="Transport Info"
+            id="transportInfo"
+            value={formData.transportInfo}
+            onChange={(e) =>
+              setFormData({ ...formData, transportInfo: e.target.value })
+            }
+            placeholder="Road access, bus routes, tuk-tuk notes, train station tips..."
+          />
+
+          <TextAreaField
+            label="Accessibility Info"
+            id="accessibilityInfo"
+            value={formData.accessibilityInfo}
+            onChange={(e) =>
+              setFormData({ ...formData, accessibilityInfo: e.target.value })
+            }
+            placeholder="Terrain difficulty, steps, wheelchair suitability, trail condition..."
+          />
+
+          <TextAreaField
+            label="Disclaimer"
+            id="disclaimer"
+            value={formData.disclaimer}
+            onChange={(e) =>
+              setFormData({ ...formData, disclaimer: e.target.value })
+            }
+            placeholder="Travel times, road conditions, and weather can change. Verify conditions before travel."
+          />
+        </div>
       </Section>
 
       <Section title="Media Gallery" icon={ImageIcon}>
@@ -515,7 +648,7 @@ export function AttractionForm({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               multiple
               onChange={handleImageUpload}
               className="hidden"
