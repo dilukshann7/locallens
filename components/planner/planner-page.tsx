@@ -400,7 +400,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
 
           <div className="stagger-item" style={{ animationDelay: "150ms" }}>
             {activeTab === "itinerary" && (
-              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="grid gap-6">
                 <div className="rounded-[2rem] bg-white p-3 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
                   <div className="overflow-hidden rounded-[1.5rem]">
                     <DayPlanner
@@ -448,9 +448,9 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                         className="emil-transition group flex flex-col overflow-hidden rounded-[1.5rem] bg-zinc-50 ring-1 ring-zinc-200/70 hover:shadow-md hover:ring-zinc-300 dark:bg-zinc-950 dark:ring-zinc-800/70 dark:hover:bg-zinc-900 dark:hover:ring-zinc-700"
                       >
                         <div className="relative h-40 w-full overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-                          {attraction.images?.[0] ? (
+                          {attraction.primaryImageUrl ? (
                             <Image
-                              src={attraction.images[0]}
+                              src={attraction.primaryImageUrl}
                               alt={attraction.name}
                               fill
                               className="emil-transition object-cover group-hover:scale-105"
@@ -739,7 +739,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                           updatePlannerMeta({ tripName: event.target.value })
                         }
                         placeholder="e.g. Weekend getaway to Ella"
-                        className="emil-transition h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                        className="emil-transition mt-1 h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                       />
                     </label>
 
@@ -751,7 +751,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                         onChange={(event) =>
                           updatePlannerMeta({ tripDate: event.target.value })
                         }
-                        className="emil-transition h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                        className="emil-transition mt-1 h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                       />
                     </label>
 
@@ -767,7 +767,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                             })
                           }
                           placeholder="e.g. Mountain Heavens hotel"
-                          className="emil-transition h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                          className="emil-transition mt-1 h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                         />
                       </label>
 
@@ -782,7 +782,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                             })
                           }
                           placeholder="e.g. Back to Ella town"
-                          className="emil-transition h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                          className="emil-transition mt-1 h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                         />
                       </label>
                     </div>
@@ -797,7 +797,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                             dayStartTime: event.target.value,
                           })
                         }
-                        className="emil-transition h-14 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
+                        className="emil-transition mt-1 h-12 w-full rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 text-base text-zinc-900 outline-none hover:border-zinc-300 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:hover:border-zinc-700 dark:focus:border-emerald-500"
                       />
                     </label>
                   </div>
