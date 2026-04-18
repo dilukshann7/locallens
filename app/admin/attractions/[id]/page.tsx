@@ -71,6 +71,7 @@ export default async function EditAttractionPage({
         attraction={{
           id: attractionData.id,
           name: attractionData.name,
+          slug: attractionData.slug,
           description: attractionData.description,
           shortDescription: attractionData.shortDescription ?? undefined,
           categoryId: attractionData.categoryId ?? undefined,
@@ -79,12 +80,18 @@ export default async function EditAttractionPage({
           address: attractionData.address ?? undefined,
           distanceFromBeragalaKm:
             attractionData.distanceFromBeragalaKm ?? undefined,
-          images: attractionData.images ?? [],
+          openingHours: attractionData.openingHours ?? undefined,
+          travelTips: attractionData.travelTips ?? undefined,
+          transportInfo: attractionData.transportInfo ?? undefined,
+          accessibilityInfo: attractionData.accessibilityInfo ?? undefined,
+          crowdLevel: attractionData.crowdLevel ?? undefined,
+          images: imageUrls,
           suggestedVisitDurationMinutes:
             attractionData.suggestedVisitDurationMinutes ?? undefined,
           bestTimeToVisit: attractionData.bestTimeToVisit ?? undefined,
           weatherNote: attractionData.weatherNote ?? undefined,
           safetyNote: attractionData.safetyNote ?? undefined,
+          disclaimer: attractionData.disclaimer ?? undefined,
           isPopular: attractionData.isPopular,
         }}
         categories={categories}
