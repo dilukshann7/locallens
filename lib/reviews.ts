@@ -64,6 +64,29 @@ export async function getReviewsByAttractionId(
   return rows.map(normalizeReview)
 }
 
+export async function getReviewsForAttraction(attractionId: string): Promise<{
+  reviews: ReviewRecord[]
+  averageRating?: number
+  reviewCount: number
+}> {
+  const reviews = await getReviewsByAttractionId(attractionId)
+  const reviewCount = reviews.length
+  const averageRating =
+    reviewCount > 0
+      ? Math.round(
+          (reviews.reduce((total, item) => total + item.rating, 0) /
+            reviewCount) *
+            10
+        ) / 10
+      : undefined
+
+  return {
+    reviews,
+    averageRating,
+    reviewCount,
+  }
+}
+
 export async function activeAttractionExists(
   attractionId: string
 ): Promise<boolean> {
