@@ -1,6 +1,6 @@
-import { and, desc, eq, inArray } from "drizzle-orm"
+import { and, desc, eq, inArray, or } from "drizzle-orm"
 import { db } from "@/lib/db"
-import { attraction, category, review } from "@/lib/db/schema"
+import { attraction, attractionImage, category, review } from "@/lib/db/schema"
 
 export interface AttractionCategory {
   id: string
@@ -11,6 +11,7 @@ export interface AttractionCategory {
 export interface AttractionRecord {
   id: string
   name: string
+  slug: string
   description: string
   shortDescription?: string
   categoryId?: string
@@ -19,10 +20,18 @@ export interface AttractionRecord {
   address?: string
   distanceFromBeragalaKm?: string
   images?: string[]
+  primaryImageUrl?: string
+  openingHours?: string
+  travelTips?: string
+  estimatedCostLkr?: number
+  transportInfo?: string
+  accessibilityInfo?: string
+  crowdLevel?: string
   suggestedVisitDurationMinutes?: number
   bestTimeToVisit?: string
   weatherNote?: string
   safetyNote?: string
+  disclaimer?: string
   isPopular: boolean
   isActive: boolean
   category?: AttractionCategory
@@ -46,6 +55,7 @@ export interface CategoryRecord {
 const attractionSelect = {
   id: attraction.id,
   name: attraction.name,
+  slug: attraction.slug,
   description: attraction.description,
   shortDescription: attraction.shortDescription,
   categoryId: attraction.categoryId,
@@ -53,11 +63,17 @@ const attractionSelect = {
   longitude: attraction.longitude,
   address: attraction.address,
   distanceFromBeragalaKm: attraction.distanceFromBeragalaKm,
-  images: attraction.images,
+  openingHours: attraction.openingHours,
+  travelTips: attraction.travelTips,
+  estimatedCostLkr: attraction.estimatedCostLkr,
+  transportInfo: attraction.transportInfo,
+  accessibilityInfo: attraction.accessibilityInfo,
+  crowdLevel: attraction.crowdLevel,
   suggestedVisitDurationMinutes: attraction.suggestedVisitDurationMinutes,
   bestTimeToVisit: attraction.bestTimeToVisit,
   weatherNote: attraction.weatherNote,
   safetyNote: attraction.safetyNote,
+  disclaimer: attraction.disclaimer,
   isPopular: attraction.isPopular,
   isActive: attraction.isActive,
   category: {
@@ -70,6 +86,7 @@ const attractionSelect = {
 interface AttractionQueryRow {
   id: string
   name: string
+  slug: string
   description: string
   shortDescription: string | null
   categoryId: string | null
@@ -77,11 +94,17 @@ interface AttractionQueryRow {
   longitude: string | null
   address: string | null
   distanceFromBeragalaKm: string | null
-  images: string[] | null
+  openingHours: string | null
+  travelTips: string | null
+  estimatedCostLkr: number | null
+  transportInfo: string | null
+  accessibilityInfo: string | null
+  crowdLevel: string | null
   suggestedVisitDurationMinutes: number | null
   bestTimeToVisit: string | null
   weatherNote: string | null
   safetyNote: string | null
+  disclaimer: string | null
   isPopular: boolean
   isActive: boolean
   category: {
@@ -93,11 +116,13 @@ interface AttractionQueryRow {
 
 function normalizeAttraction(
   row: AttractionQueryRow,
-  summary?: ReviewSummary
+  summary?: ReviewSummary,
+  images: string[] = []
 ): AttractionRecord {
   return {
     id: row.id,
     name: row.name,
+    slug: row.slug,
     description: row.description,
     shortDescription: row.shortDescription ?? undefined,
     categoryId: row.categoryId ?? undefined,
@@ -105,12 +130,20 @@ function normalizeAttraction(
     longitude: row.longitude ?? undefined,
     address: row.address ?? undefined,
     distanceFromBeragalaKm: row.distanceFromBeragalaKm ?? undefined,
-    images: row.images ?? undefined,
+    images: images.length > 0 ? images : undefined,
+    primaryImageUrl: images[0],
+    openingHours: row.openingHours ?? undefined,
+    travelTips: row.travelTips ?? undefined,
+    estimatedCostLkr: row.estimatedCostLkr ?? undefined,
+    transportInfo: row.transportInfo ?? undefined,
+    accessibilityInfo: row.accessibilityInfo ?? undefined,
+    crowdLevel: row.crowdLevel ?? undefined,
     suggestedVisitDurationMinutes:
       row.suggestedVisitDurationMinutes ?? undefined,
     bestTimeToVisit: row.bestTimeToVisit ?? undefined,
     weatherNote: row.weatherNote ?? undefined,
     safetyNote: row.safetyNote ?? undefined,
+    disclaimer: row.disclaimer ?? undefined,
     isPopular: row.isPopular,
     isActive: row.isActive,
     category:
@@ -124,6 +157,37 @@ function normalizeAttraction(
     averageRating: summary?.averageRating,
     reviewCount: summary?.reviewCount ?? 0,
   }
+}
+
+async function getAttractionImages(
+  attractionIds: string[]
+): Promise<Map<string, string[]>> {
+  if (attractionIds.length === 0) {
+    return new Map()
+  }
+
+  const rows = await db
+    .select({
+      attractionId: attractionImage.attractionId,
+      url: attractionImage.url,
+    })
+    .from(attractionImage)
+    .where(inArray(attractionImage.attractionId, attractionIds))
+    .orderBy(
+      desc(attractionImage.isPrimary),
+      attractionImage.position,
+      attractionImage.createdAt
+    )
+
+  const imagesByAttractionId = new Map<string, string[]>()
+
+  for (const row of rows) {
+    const images = imagesByAttractionId.get(row.attractionId) ?? []
+    images.push(row.url)
+    imagesByAttractionId.set(row.attractionId, images)
+  }
+
+  return imagesByAttractionId
 }
 
 async function getReviewSummaries(
@@ -181,8 +245,11 @@ export async function getActiveAttractions(): Promise<AttractionRecord[]> {
     .orderBy(desc(attraction.isPopular), attraction.name)
 
   const summaries = await getReviewSummaries(rows.map((row) => row.id))
+  const images = await getAttractionImages(rows.map((row) => row.id))
 
-  return rows.map((row) => normalizeAttraction(row, summaries.get(row.id)))
+  return rows.map((row) =>
+    normalizeAttraction(row, summaries.get(row.id), images.get(row.id))
+  )
 }
 
 export async function getActiveAttractionsByIds(
@@ -201,9 +268,14 @@ export async function getActiveAttractionsByIds(
     )
 
   const summaries = await getReviewSummaries(rows.map((row) => row.id))
+  const images = await getAttractionImages(rows.map((row) => row.id))
   const attractionsById = new Map(
     rows.map((row) => {
-      const normalized = normalizeAttraction(row, summaries.get(row.id))
+      const normalized = normalizeAttraction(
+        row,
+        summaries.get(row.id),
+        images.get(row.id)
+      )
       return [normalized.id, normalized] as const
     })
   )
@@ -228,8 +300,33 @@ export async function getActiveAttractionById(
   }
 
   const summaries = await getReviewSummaries([row.id])
+  const images = await getAttractionImages([row.id])
 
-  return normalizeAttraction(row, summaries.get(row.id))
+  return normalizeAttraction(row, summaries.get(row.id), images.get(row.id))
+}
+
+export async function getActiveAttractionBySlugOrId(
+  identifier: string
+): Promise<AttractionRecord | null> {
+  const row = await db
+    .select(attractionSelect)
+    .from(attraction)
+    .leftJoin(category, eq(attraction.categoryId, category.id))
+    .where(
+      and(
+        or(eq(attraction.id, identifier), eq(attraction.slug, identifier)),
+        eq(attraction.isActive, true)
+      )
+    )
+    .then((rows) => rows[0] ?? null)
+
+  if (!row) {
+    return null
+  }
+
+  const summaries = await getReviewSummaries([row.id])
+  const images = await getAttractionImages([row.id])
+  return normalizeAttraction(row, summaries.get(row.id), images.get(row.id))
 }
 
 export async function getCategories(): Promise<CategoryRecord[]> {
