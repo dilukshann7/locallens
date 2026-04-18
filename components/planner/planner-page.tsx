@@ -1,17 +1,19 @@
 "use client"
 
-import Link from "next/link"
+import dynamic from "next/dynamic"
 import Image from "next/image"
+import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import dynamic from "next/dynamic"
 import {
   ArrowLeft,
+  CarFront,
   CirclePlus,
   Clock3,
   Compass,
   FolderOpen,
   History,
+  ListOrdered,
   LogIn,
   LogOut,
   Map,
@@ -24,36 +26,35 @@ import {
   Ticket,
   Trash2,
   UserPlus,
-  CarFront,
-  ListOrdered,
 } from "lucide-react"
 import { DayPlanner } from "@/components/planner/day-planner"
-const PlannerMap = dynamic(
-  () =>
-    import("@/components/planner/planner-map").then((mod) => mod.PlannerMap),
-  { ssr: false }
-)
 import { ThemeToggle } from "@/components/shared/theme-toggle"
-import { signOut } from "@/lib/auth/client"
-import { useDayPlanner } from "@/hooks/use-day-planner"
-import type { AttractionRecord } from "@/lib/attractions"
-import { formatTimeLabel, parseTimeToMinutes } from "@/lib/planner-types"
-import { cn } from "@/lib/utils"
 import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useDayPlanner } from "@/hooks/use-day-planner"
+import { signOut } from "@/lib/auth/client"
+import type { AttractionRecord } from "@/lib/attractions"
+import { formatTimeLabel, parseTimeToMinutes } from "@/lib/planner-types"
+import { cn } from "@/lib/utils"
+
+const PlannerMap = dynamic(
+  () =>
+    import("@/components/planner/planner-map").then((mod) => mod.PlannerMap),
+  { ssr: false }
+)
 
 interface PlannerPageProps {
   attractions: AttractionRecord[]
 }
 
-type TabValue = "itinerary" | "discover" | "saved" | "settings"
+type TabValue = "overview" | "itinerary" | "discover" | "saved" | "settings"
 
 export function PlannerPage({ attractions }: PlannerPageProps) {
-  const [activeTab, setActiveTab] = useState<TabValue>("itinerary")
+  const [activeTab, setActiveTab] = useState<TabValue>("overview")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
 
@@ -115,9 +116,15 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
     const didLoad = await loadTrip(tripId)
 
     if (didLoad) {
-      setActiveTab("itinerary")
+      setActiveTab("overview")
       setIsMobileMenuOpen(false)
     }
+  }
+
+  const handleStartNewTrip = () => {
+    startNewTrip()
+    setActiveTab("overview")
+    setIsMobileMenuOpen(false)
   }
 
   const handleSignOut = async () => {
@@ -147,6 +154,20 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
             Planner
           </p>
           <button
+            type="button"
+            onClick={() => handleTabClick("overview")}
+            className={cn(
+              "emil-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
+              activeTab === "overview"
+                ? "bg-zinc-900 text-white shadow-md dark:bg-zinc-50 dark:text-zinc-900"
+                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
+            )}
+          >
+            <Compass className="h-4 w-4" />
+            Overview
+          </button>
+          <button
+            type="button"
             onClick={() => handleTabClick("itinerary")}
             className={cn(
               "emil-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
@@ -159,6 +180,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
             Itinerary Schedule
           </button>
           <button
+            type="button"
             onClick={() => handleTabClick("discover")}
             className={cn(
               "emil-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
@@ -171,6 +193,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
             Discover Stops
           </button>
           <button
+            type="button"
             onClick={() => handleTabClick("saved")}
             className={cn(
               "emil-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
@@ -183,6 +206,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
             Saved Trips
           </button>
           <button
+            type="button"
             onClick={() => handleTabClick("settings")}
             className={cn(
               "emil-button flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all",
@@ -274,7 +298,10 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
           <ThemeToggle />
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <button className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50">
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
+              >
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
@@ -399,6 +426,223 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
           </div>
 
           <div className="stagger-item" style={{ animationDelay: "150ms" }}>
+            {activeTab === "overview" && (
+              <div className="grid gap-6">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <p className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+                      Stops
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
+                      {plannerItems.length}
+                    </p>
+                  </div>
+                  <div className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <p className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+                      On Site
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
+                      {Math.floor(totalVisitDuration / 60)}h{" "}
+                      {totalVisitDuration % 60}m
+                    </p>
+                  </div>
+                  <div className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <p className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+                      Transit
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
+                      {Math.floor(totalTravelDuration / 60)}h{" "}
+                      {totalTravelDuration % 60}m
+                    </p>
+                  </div>
+                  <div className="rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <p className="text-xs font-bold tracking-[0.2em] text-zinc-500 uppercase dark:text-zinc-400">
+                      Finish
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-zinc-950 dark:text-zinc-50">
+                      {finishTime}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+                  <section className="flex max-h-[544px] min-h-0 flex-col overflow-hidden rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-zinc-200/60 sm:p-8 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-bold tracking-[0.24em] text-emerald-600 uppercase dark:text-emerald-400">
+                          Available Plans
+                        </p>
+                        <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+                          Pick a plan to view
+                        </h2>
+                        <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                          Open a draft or saved trip and view its route with the
+                          map in one place.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleStartNewTrip}
+                        className="emil-button inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
+                      >
+                        <CirclePlus className="h-4 w-4" />
+                        New Draft
+                      </button>
+                    </div>
+
+                    <div className="mt-8 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                      <button
+                        type="button"
+                        onClick={handleStartNewTrip}
+                        className={cn(
+                          "emil-button w-full rounded-[1.5rem] border p-5 text-left transition-colors",
+                          !activeTripId
+                            ? "border-emerald-300 bg-emerald-50/70 dark:border-emerald-700 dark:bg-emerald-500/10"
+                            : "border-zinc-200 bg-zinc-50/80 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950/50 dark:hover:bg-zinc-900"
+                        )}
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <p className="font-bold text-zinc-950 dark:text-zinc-50">
+                            Current Draft
+                          </p>
+                          {!activeTripId && (
+                            <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                          {plannerSummary}
+                        </p>
+                      </button>
+
+                      {isSignedIn && trips.length > 0 ? (
+                        trips.map((trip) => {
+                          const isCurrentTrip = trip.id === activeTripId
+
+                          return (
+                            <button
+                              key={trip.id}
+                              type="button"
+                              onClick={() => {
+                                void handleLoadTrip(trip.id)
+                              }}
+                              className={cn(
+                                "emil-button w-full rounded-[1.5rem] border p-5 text-left transition-colors",
+                                isCurrentTrip
+                                  ? "border-emerald-300 bg-emerald-50/70 dark:border-emerald-700 dark:bg-emerald-500/10"
+                                  : "border-zinc-200 bg-zinc-50/80 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950/50 dark:hover:bg-zinc-900"
+                              )}
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-3">
+                                <p className="font-bold text-zinc-950 dark:text-zinc-50">
+                                  {trip.name}
+                                </p>
+                                {isCurrentTrip && (
+                                  <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase">
+                                    Current
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                                {trip.tripDate
+                                  ? new Date(
+                                      trip.tripDate
+                                    ).toLocaleDateString()
+                                  : "No date set"}{" "}
+                                • {trip.stopCount} stop
+                                {trip.stopCount === 1 ? "" : "s"}
+                              </p>
+                            </button>
+                          )
+                        })
+                      ) : (
+                        <div className="rounded-[1.5rem] border border-dashed border-zinc-300 bg-zinc-50/80 p-5 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-300">
+                          {isSignedIn
+                            ? "No saved trips yet. Save this planner and it will appear here."
+                            : "Your current planner is stored in this browser. Sign in to keep multiple saved trips."}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="rounded-[2rem] bg-white p-3 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                    <div className="h-[520px] overflow-hidden rounded-[1.5rem]">
+                      <PlannerMap
+                        items={plannerItems}
+                        startLocation={startLocation}
+                        endLocation={endLocation}
+                      />
+                    </div>
+                  </section>
+                </div>
+
+                <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-zinc-200/60 sm:p-8 dark:bg-zinc-900 dark:ring-zinc-800/60">
+                  <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold tracking-[0.24em] text-emerald-600 uppercase dark:text-emerald-400">
+                        Current Route
+                      </p>
+                      <h2 className="mt-2 text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+                        Final plan
+                      </h2>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTabClick("itinerary")}
+                      className="emil-button inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    >
+                      <ListOrdered className="h-4 w-4" />
+                      Edit Schedule
+                    </button>
+                  </div>
+
+                  {plannerItems.length === 0 ? (
+                    <div className="rounded-[1.5rem] border border-dashed border-zinc-300 bg-zinc-50/80 px-5 py-14 text-center dark:border-zinc-700 dark:bg-zinc-950/50">
+                      <MapPin className="mx-auto h-10 w-10 text-zinc-400 dark:text-zinc-500" />
+                      <p className="mt-4 text-lg font-bold text-zinc-950 dark:text-zinc-50">
+                        No stops in this plan yet
+                      </p>
+                      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+                        Add places from Discover Stops to see the final route.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3">
+                      {plannerItems.map((item, index) => (
+                        <div
+                          key={item.id}
+                          className="flex flex-wrap items-center justify-between gap-4 rounded-[1.25rem] border border-zinc-200 bg-zinc-50/80 p-4 dark:border-zinc-800 dark:bg-zinc-950/50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-sm font-bold text-white dark:bg-zinc-50 dark:text-zinc-900">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="font-bold text-zinc-950 dark:text-zinc-50">
+                                {item.name}
+                              </p>
+                              <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                                {item.category?.name || "Attraction"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-2 text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                            <span className="rounded-full bg-white px-3 py-1 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                              {item.visitDurationMinutes}m stay
+                            </span>
+                            <span className="rounded-full bg-white px-3 py-1 ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                              {item.travelMinutes}m transit
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+            )}
+
             {activeTab === "itinerary" && (
               <div className="grid gap-6">
                 <div className="rounded-[2rem] bg-white p-3 shadow-sm ring-1 ring-zinc-200/60 dark:bg-zinc-900 dark:ring-zinc-800/60">
@@ -511,6 +755,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                 </div>
               </section>
             )}
+
             {activeTab === "saved" && (
               <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
                 <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-zinc-200/60 sm:p-8 dark:bg-zinc-900 dark:ring-zinc-800/60">
@@ -581,10 +826,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => {
-                                startNewTrip()
-                                setActiveTab("itinerary")
-                              }}
+                              onClick={handleStartNewTrip}
                               className="emil-button inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-bold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900"
                             >
                               <CirclePlus className="h-4 w-4" />
@@ -723,6 +965,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                 </section>
               </div>
             )}
+
             {activeTab === "settings" && (
               <div className="grid gap-6 lg:grid-cols-2">
                 <section className="rounded-[2rem] bg-white p-6 shadow-sm ring-1 ring-zinc-200/60 sm:p-8 dark:bg-zinc-900 dark:ring-zinc-800/60">
@@ -823,8 +1066,8 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                         <Ticket className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
                       </div>
                       <p className="pt-1 leading-relaxed">
-                        Use notes for entry fees, snacks, viewpoints, footwear,
-                        or sunset timing. Don&apos;t rely on memory.
+                        Use notes for snacks, viewpoints, footwear, or sunset
+                        timing. Don&apos;t rely on memory.
                       </p>
                     </div>
                     <div className="flex items-start gap-4 rounded-2xl border border-zinc-100 bg-zinc-50 p-5 dark:border-zinc-800/50 dark:bg-zinc-950/50">
