@@ -136,6 +136,12 @@ export function TouristExplorer({
             </div>
 
             <div className="flex items-center justify-between gap-3 sm:justify-end">
+              <Link
+                href="/map"
+                className="hidden rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900 md:inline-flex dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
+              >
+                Map
+              </Link>
               <ThemeToggle />
               <div className="flex items-center rounded-full bg-zinc-100 p-1 dark:bg-zinc-900">
                 <button
@@ -233,10 +239,9 @@ export function TouristExplorer({
             {selectedAttraction && (
               <div className="flex h-full min-h-0 flex-col bg-white dark:bg-zinc-950">
                 <div className="relative h-72 w-full shrink-0 bg-zinc-100 dark:bg-zinc-900">
-                  {selectedAttraction.images &&
-                  selectedAttraction.images.length > 0 ? (
+                  {selectedAttraction.primaryImageUrl ? (
                     <Image
-                      src={selectedAttraction.images[0]}
+                      src={selectedAttraction.primaryImageUrl}
                       alt={selectedAttraction.name}
                       fill
                       className="object-cover"
@@ -389,7 +394,7 @@ export function TouristExplorer({
                         : "Add to Planner"}
                     </button>
                     <Link
-                      href={`/attractions/${selectedAttraction.id}`}
+                      href={`/attractions/${selectedAttraction.slug}`}
                       className="flex items-center justify-center rounded-xl border border-zinc-200 py-3.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-300 hover:text-zinc-950 dark:border-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:text-zinc-50"
                     >
                       Open Full Guide

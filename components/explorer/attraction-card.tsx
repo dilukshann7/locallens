@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MapPin, Clock, Plus, Check, Star } from "lucide-react"
+import { MapPin, Clock, Plus, Check, Star, Wallet } from "lucide-react"
 import Image from "next/image"
 import type { AttractionRecord } from "@/lib/attractions"
 
@@ -41,9 +41,9 @@ export function AttractionCard({
       style={{ animationDelay: `${index * 35}ms` }}
     >
       <div className="relative aspect-4/3 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-900">
-        {attraction.images?.[0] ? (
+        {attraction.primaryImageUrl ? (
           <Image
-            src={attraction.images[0]}
+            src={attraction.primaryImageUrl}
             alt={attraction.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -126,15 +126,15 @@ export function AttractionCard({
                 {attraction.suggestedVisitDurationMinutes}m
               </span>
             )}
-            {attraction.reviewCount > 0 && attraction.averageRating && (
+            {attraction.reviewCount > 0 && attraction.averageRating ? (
               <span className="flex items-center gap-1.5">
                 <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
                 {attraction.averageRating.toFixed(1)} ({attraction.reviewCount})
               </span>
-            )}
-            {attraction.bestTimeToVisit && (
-              <span className="line-clamp-1 flex-1 text-right">
-                Best: {attraction.bestTimeToVisit}
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <Star className="h-3.5 w-3.5 text-zinc-400" />
+                No ratings
               </span>
             )}
           </div>
