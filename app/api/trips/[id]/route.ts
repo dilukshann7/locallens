@@ -42,6 +42,8 @@ function getPlannerPayload(body: unknown): PlannerState | null {
             {
               id: item.id as string,
               name: item.name as string,
+              slug:
+                typeof item.slug === "string" ? item.slug : (item.id as string),
               description: item.description as string,
               shortDescription:
                 typeof item.shortDescription === "string"
@@ -66,6 +68,14 @@ function getPlannerPayload(body: unknown): PlannerState | null {
                     (value): value is string => typeof value === "string"
                   )
                 : undefined,
+              primaryImageUrl:
+                typeof item.primaryImageUrl === "string"
+                  ? item.primaryImageUrl
+                  : undefined,
+              estimatedCostLkr:
+                typeof item.estimatedCostLkr === "number"
+                  ? item.estimatedCostLkr
+                  : undefined,
               suggestedVisitDurationMinutes:
                 typeof item.suggestedVisitDurationMinutes === "number"
                   ? item.suggestedVisitDurationMinutes
