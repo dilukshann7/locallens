@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useSession } from "@/lib/auth/client"
 import type { AttractionRecord } from "@/lib/attractions"
 import {
@@ -31,6 +31,7 @@ function parseStoredAttraction(item: unknown): AttractionRecord | null {
   return {
     id: item.id,
     name: item.name,
+    slug: typeof item.slug === "string" ? item.slug : item.id,
     description: typeof item.description === "string" ? item.description : "",
     shortDescription:
       typeof item.shortDescription === "string"
@@ -50,6 +51,22 @@ function parseStoredAttraction(item: unknown): AttractionRecord | null {
           (value): value is string => typeof value === "string"
         )
       : undefined,
+    primaryImageUrl:
+      typeof item.primaryImageUrl === "string"
+        ? item.primaryImageUrl
+        : undefined,
+    openingHours:
+      typeof item.openingHours === "string" ? item.openingHours : undefined,
+    travelTips:
+      typeof item.travelTips === "string" ? item.travelTips : undefined,
+    transportInfo:
+      typeof item.transportInfo === "string" ? item.transportInfo : undefined,
+    accessibilityInfo:
+      typeof item.accessibilityInfo === "string"
+        ? item.accessibilityInfo
+        : undefined,
+    crowdLevel:
+      typeof item.crowdLevel === "string" ? item.crowdLevel : undefined,
     suggestedVisitDurationMinutes:
       typeof item.suggestedVisitDurationMinutes === "number"
         ? item.suggestedVisitDurationMinutes
@@ -62,6 +79,8 @@ function parseStoredAttraction(item: unknown): AttractionRecord | null {
       typeof item.weatherNote === "string" ? item.weatherNote : undefined,
     safetyNote:
       typeof item.safetyNote === "string" ? item.safetyNote : undefined,
+    disclaimer:
+      typeof item.disclaimer === "string" ? item.disclaimer : undefined,
     isPopular: Boolean(item.isPopular),
     isActive: item.isActive !== false,
     averageRating:
@@ -239,35 +258,66 @@ async function updateTrip(tripId: string, plannerState: PlannerState) {
 
 export function useDayPlanner() {
   const { data: session, isPending } = useSession()
+  const [hasHydrated, setHasHydrated] = useState(false)
   const [plannerState, setPlannerState] = useState<PlannerState>(
-    readPlannerFromStorage
+    createEmptyPlannerState
   )
-  const [activeTripId, setActiveTripId] = useState<string | null>(
-    readActiveTripIdFromStorage
-  )
+  const [activeTripId, setActiveTripId] = useState<string | null>(null)
   const [trips, setTrips] = useState<PlannerTripSummary[]>([])
   const [isPlannerLoading, setIsPlannerLoading] = useState(false)
   const [isPlannerSyncing, setIsPlannerSyncing] = useState(false)
   const [isTripListLoading, setIsTripListLoading] = useState(false)
   const initializedUserId = useRef<string | null | undefined>(undefined)
   const lastSavedSignature = useRef(
-    plannerStateSignature(readPlannerFromStorage())
+    plannerStateSignature(createEmptyPlannerState())
   )
+  const plannerStateRef = useRef<PlannerState>(createEmptyPlannerState())
+  const activeTripIdRef = useRef<string | null>(null)
+  const autosaveInFlightRef = useRef(false)
+  const autosavePendingRef = useRef(false)
+  const autosavePromiseRef = useRef<Promise<void> | null>(null)
 
-  const plannerMode = session?.user?.id ? "account" : "browser"
+  const plannerMode = hasHydrated && session?.user?.id ? "account" : "browser"
 
   useEffect(() => {
-    localStorage.setItem(PLANNER_STORAGE_KEY, JSON.stringify(plannerState))
+    plannerStateRef.current = plannerState
   }, [plannerState])
 
   useEffect(() => {
+    activeTripIdRef.current = activeTripId
+  }, [activeTripId])
+
+  useEffect(() => {
+    const localState = readPlannerFromStorage()
+    const storedTripId = readActiveTripIdFromStorage()
+    plannerStateRef.current = localState
+    activeTripIdRef.current = storedTripId
+    setPlannerState(localState)
+    setActiveTripId(storedTripId)
+    lastSavedSignature.current = plannerStateSignature(localState)
+    setHasHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return
+    }
+
+    localStorage.setItem(PLANNER_STORAGE_KEY, JSON.stringify(plannerState))
+  }, [hasHydrated, plannerState])
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return
+    }
+
     if (activeTripId) {
       localStorage.setItem(ACTIVE_TRIP_STORAGE_KEY, activeTripId)
       return
     }
 
     localStorage.removeItem(ACTIVE_TRIP_STORAGE_KEY)
-  }, [activeTripId])
+  }, [activeTripId, hasHydrated])
 
   async function refreshTrips() {
     if (!session?.user?.id) {
@@ -289,22 +339,107 @@ export function useDayPlanner() {
     }
   }
 
+  const saveLatestTripChanges = useCallback(async () => {
+    if (!session?.user?.id || !activeTripIdRef.current) {
+      return
+    }
+
+    if (autosaveInFlightRef.current) {
+      autosavePendingRef.current = true
+      await autosavePromiseRef.current
+      return
+    }
+
+    autosaveInFlightRef.current = true
+    setIsPlannerSyncing(true)
+
+    const autosavePromise = (async () => {
+      try {
+        do {
+          autosavePendingRef.current = false
+
+          const tripId = activeTripIdRef.current
+          const submittedPlanner = plannerStateRef.current
+          const submittedSignature = plannerStateSignature(submittedPlanner)
+
+          if (
+            !tripId ||
+            submittedSignature === lastSavedSignature.current
+          ) {
+            break
+          }
+
+          const result = await updateTrip(tripId, submittedPlanner)
+          lastSavedSignature.current = submittedSignature
+
+          const currentSignature = plannerStateSignature(
+            plannerStateRef.current
+          )
+
+          if (
+            activeTripIdRef.current === tripId &&
+            currentSignature === submittedSignature
+          ) {
+            plannerStateRef.current = result.planner
+            setPlannerState(result.planner)
+            lastSavedSignature.current = plannerStateSignature(result.planner)
+          }
+
+          try {
+            const nextTrips = await fetchTripsList()
+            setTrips(nextTrips)
+          } catch (error) {
+            console.error("Trips refresh failed:", error)
+          }
+        } while (
+          autosavePendingRef.current ||
+          plannerStateSignature(plannerStateRef.current) !==
+            lastSavedSignature.current
+        )
+      } catch (error) {
+        console.error("Trip autosave failed:", error)
+      } finally {
+        autosaveInFlightRef.current = false
+        autosavePromiseRef.current = null
+        setIsPlannerSyncing(false)
+      }
+    })()
+
+    autosavePromiseRef.current = autosavePromise
+    await autosavePromise
+  }, [session?.user?.id])
+
   async function saveCurrentTrip(asNew = false) {
     if (!session?.user?.id) {
       return null
     }
 
+    if (!asNew && activeTripIdRef.current) {
+      await saveLatestTripChanges()
+      return activeTripIdRef.current
+    }
+
+    const submittedPlanner = plannerStateRef.current
+    const submittedSignature = plannerStateSignature(submittedPlanner)
+
     setIsPlannerSyncing(true)
 
     try {
-      const result =
-        !asNew && activeTripId
-          ? await updateTrip(activeTripId, plannerState)
-          : await createTrip(plannerState)
-
-      setPlannerState(result.planner)
+      const result = await createTrip(submittedPlanner)
+      activeTripIdRef.current = result.tripId
       setActiveTripId(result.tripId)
-      lastSavedSignature.current = plannerStateSignature(result.planner)
+
+      const currentSignature = plannerStateSignature(plannerStateRef.current)
+      lastSavedSignature.current = submittedSignature
+
+      if (currentSignature === submittedSignature) {
+        plannerStateRef.current = result.planner
+        setPlannerState(result.planner)
+        lastSavedSignature.current = plannerStateSignature(result.planner)
+      } else {
+        void saveLatestTripChanges()
+      }
+
       await refreshTrips()
 
       return result.tripId
@@ -325,6 +460,8 @@ export function useDayPlanner() {
 
     try {
       const nextPlanner = await fetchTrip(tripId)
+      plannerStateRef.current = nextPlanner
+      activeTripIdRef.current = tripId
       setPlannerState(nextPlanner)
       setActiveTripId(tripId)
       lastSavedSignature.current = plannerStateSignature(nextPlanner)
@@ -338,7 +475,7 @@ export function useDayPlanner() {
   }
 
   useEffect(() => {
-    if (isPending) {
+    if (!hasHydrated || isPending) {
       return
     }
 
@@ -352,6 +489,8 @@ export function useDayPlanner() {
 
     if (!userId) {
       const localState = readPlannerFromStorage()
+      plannerStateRef.current = localState
+      activeTripIdRef.current = null
       setPlannerState(localState)
       setActiveTripId(null)
       setTrips([])
@@ -376,6 +515,8 @@ export function useDayPlanner() {
           : (nextTrips[0]?.id ?? null)
 
         if (!selectedTripId) {
+          plannerStateRef.current = localState
+          activeTripIdRef.current = null
           setPlannerState(localState)
           setActiveTripId(null)
           lastSavedSignature.current = plannerStateSignature(localState)
@@ -383,6 +524,8 @@ export function useDayPlanner() {
         }
 
         const selectedPlanner = await fetchTrip(selectedTripId)
+        plannerStateRef.current = selectedPlanner
+        activeTripIdRef.current = selectedTripId
         setPlannerState(selectedPlanner)
         setActiveTripId(selectedTripId)
         lastSavedSignature.current = plannerStateSignature(selectedPlanner)
@@ -393,10 +536,16 @@ export function useDayPlanner() {
         setIsTripListLoading(false)
       }
     })()
-  }, [isPending, session?.user?.id])
+  }, [hasHydrated, isPending, session?.user?.id])
 
   useEffect(() => {
-    if (isPending || isPlannerLoading || !session?.user?.id || !activeTripId) {
+    if (
+      !hasHydrated ||
+      isPending ||
+      isPlannerLoading ||
+      !session?.user?.id ||
+      !activeTripId
+    ) {
       return
     }
 
@@ -407,34 +556,17 @@ export function useDayPlanner() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      void (async () => {
-        setIsPlannerSyncing(true)
-
-        try {
-          const result = await updateTrip(activeTripId, plannerState)
-          setPlannerState(result.planner)
-          lastSavedSignature.current = plannerStateSignature(result.planner)
-
-          try {
-            const nextTrips = await fetchTripsList()
-            setTrips(nextTrips)
-          } catch (error) {
-            console.error("Trips refresh failed:", error)
-          }
-        } catch (error) {
-          console.error("Trip autosave failed:", error)
-        } finally {
-          setIsPlannerSyncing(false)
-        }
-      })()
+      void saveLatestTripChanges()
     }, 350)
 
     return () => window.clearTimeout(timeoutId)
   }, [
     activeTripId,
+    hasHydrated,
     isPending,
     isPlannerLoading,
     plannerState,
+    saveLatestTripChanges,
     session?.user?.id,
   ])
 
@@ -459,37 +591,51 @@ export function useDayPlanner() {
         return currentState
       }
 
-      return {
+      const nextState = {
         ...currentState,
         items: [...currentState.items, toPlannerStop(attraction)],
       }
+      plannerStateRef.current = nextState
+      return nextState
     })
   }
 
   const removeFromPlanner = (attractionId: string) => {
-    setPlannerState((currentState) => ({
-      ...currentState,
-      items: currentState.items.filter((item) => item.id !== attractionId),
-    }))
+    setPlannerState((currentState) => {
+      const nextState = {
+        ...currentState,
+        items: currentState.items.filter((item) => item.id !== attractionId),
+      }
+      plannerStateRef.current = nextState
+      return nextState
+    })
   }
 
   const reorderPlanner = (items: PlannerStop[]) => {
-    setPlannerState((currentState) => ({
-      ...currentState,
-      items,
-    }))
+    setPlannerState((currentState) => {
+      const nextState = {
+        ...currentState,
+        items,
+      }
+      plannerStateRef.current = nextState
+      return nextState
+    })
   }
 
   const updatePlannerItem = (
     attractionId: string,
     patch: Partial<PlannerStop>
   ) => {
-    setPlannerState((currentState) => ({
-      ...currentState,
-      items: currentState.items.map((item) =>
-        item.id === attractionId ? { ...item, ...patch } : item
-      ),
-    }))
+    setPlannerState((currentState) => {
+      const nextState = {
+        ...currentState,
+        items: currentState.items.map((item) =>
+          item.id === attractionId ? { ...item, ...patch } : item
+        ),
+      }
+      plannerStateRef.current = nextState
+      return nextState
+    })
   }
 
   const updatePlannerMeta = (
@@ -504,21 +650,31 @@ export function useDayPlanner() {
       >
     >
   ) => {
-    setPlannerState((currentState) => ({
-      ...currentState,
-      ...patch,
-    }))
+    setPlannerState((currentState) => {
+      const nextState = {
+        ...currentState,
+        ...patch,
+      }
+      plannerStateRef.current = nextState
+      return nextState
+    })
   }
 
   const clearPlanner = () => {
-    setPlannerState((currentState) => ({
-      ...currentState,
-      items: [],
-    }))
+    setPlannerState((currentState) => {
+      const nextState = {
+        ...currentState,
+        items: [],
+      }
+      plannerStateRef.current = nextState
+      return nextState
+    })
   }
 
   const startNewTrip = () => {
     const emptyState = createEmptyPlannerState()
+    plannerStateRef.current = emptyState
+    activeTripIdRef.current = null
     setPlannerState(emptyState)
     setActiveTripId(null)
     lastSavedSignature.current = plannerStateSignature(emptyState)
