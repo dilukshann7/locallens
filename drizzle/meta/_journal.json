@@ -22,6 +22,13 @@
       "when": 1776446890386,
       "tag": "0002_nervous_tana_nile",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776499288093,
+      "tag": "0003_attraction_images_and_details",
+      "breakpoints": true
     }
   ]
 }

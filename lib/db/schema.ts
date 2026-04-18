@@ -128,6 +128,7 @@ export const attraction = pgTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
     description: text("description").notNull(),
     shortDescription: text("short_description"),
     categoryId: text("category_id").references(() => category.id, {
@@ -140,11 +141,17 @@ export const attraction = pgTable(
       precision: 5,
       scale: 2,
     }),
-    images: text("images").array(),
+    openingHours: text("opening_hours"),
+    travelTips: text("travel_tips"),
+    estimatedCostLkr: integer("estimated_cost_lkr"),
+    transportInfo: text("transport_info"),
+    accessibilityInfo: text("accessibility_info"),
+    crowdLevel: text("crowd_level"),
     suggestedVisitDurationMinutes: integer("suggested_visit_duration_minutes"),
     bestTimeToVisit: text("best_time_to_visit"),
     weatherNote: text("weather_note"),
     safetyNote: text("safety_note"),
+    disclaimer: text("disclaimer"),
     isPopular: boolean("is_popular").default(false).notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -153,10 +160,33 @@ export const attraction = pgTable(
       .notNull(),
   },
   (table) => [
+    index("attraction_slug_idx").on(table.slug),
     index("attraction_category_idx").on(table.categoryId),
     index("attraction_active_idx").on(table.isActive),
     index("attraction_popular_idx").on(table.isPopular),
     index("attraction_location_idx").on(table.latitude, table.longitude),
+  ]
+)
+
+export const attractionImage = pgTable(
+  "attraction_images",
+  {
+    id: text("id").primaryKey(),
+    attractionId: text("attraction_id")
+      .notNull()
+      .references(() => attraction.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    altText: text("alt_text"),
+    isPrimary: boolean("is_primary").default(false).notNull(),
+    position: integer("position").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("attraction_image_attraction_idx").on(table.attractionId),
+    index("attraction_image_position_idx").on(
+      table.attractionId,
+      table.position
+    ),
   ]
 )
 
@@ -235,9 +265,20 @@ export const attractionRelations = relations(attraction, ({ one, many }) => ({
     fields: [attraction.categoryId],
     references: [category.id],
   }),
+  images: many(attractionImage),
   reviews: many(review),
   itineraryItems: many(itineraryItem),
 }))
+
+export const attractionImageRelations = relations(
+  attractionImage,
+  ({ one }) => ({
+    attraction: one(attraction, {
+      fields: [attractionImage.attractionId],
+      references: [attraction.id],
+    }),
+  })
+)
 
 export const reviewRelations = relations(review, ({ one }) => ({
   attraction: one(attraction, {
