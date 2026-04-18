@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { uploadImage } from "@/lib/blob"
 import { isCurrentUserAdmin } from "@/lib/auth/session"
 
+const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"])
+const maxImageSizeBytes = 5 * 1024 * 1024
+
 export async function POST(request: NextRequest) {
   try {
     if (!(await isCurrentUserAdmin())) {
@@ -14,6 +17,20 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
+    }
+
+    if (!allowedImageTypes.has(file.type)) {
+      return NextResponse.json(
+        { error: "Only JPEG, PNG, and WebP images are supported" },
+        { status: 400 }
+      )
+    }
+
+    if (file.size > maxImageSizeBytes) {
+      return NextResponse.json(
+        { error: "Image must be 5 MB or smaller" },
+        { status: 400 }
+      )
     }
 
     if (!attractionId) {
