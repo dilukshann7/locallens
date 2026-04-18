@@ -1,6 +1,6 @@
 import { db } from "@/lib/db"
-import { attraction, category } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
+import { attraction, attractionImage, category } from "@/lib/db/schema"
+import { desc, eq } from "drizzle-orm"
 import { AttractionForm } from "@/components/admin/attraction-form"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -18,15 +18,30 @@ async function getCategories() {
   return db.select().from(category).orderBy(category.name)
 }
 
+async function getAttractionImageUrls(attractionId: string) {
+  const rows = await db
+    .select({ url: attractionImage.url })
+    .from(attractionImage)
+    .where(eq(attractionImage.attractionId, attractionId))
+    .orderBy(
+      desc(attractionImage.isPrimary),
+      attractionImage.position,
+      attractionImage.createdAt
+    )
+
+  return rows.map((row) => row.url)
+}
+
 export default async function EditAttractionPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [attractionData, categories] = await Promise.all([
+  const [attractionData, categories, imageUrls] = await Promise.all([
     getAttraction(id),
     getCategories(),
+    getAttractionImageUrls(id),
   ])
 
   if (!attractionData) {
