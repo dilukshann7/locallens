@@ -44,34 +44,6 @@ The current implementation includes:
 - Database access is centralized in [`lib/db.ts`](/D:/Programming/Nextjs/locallens/lib/db.ts), [`lib/attractions.ts`](/D:/Programming/Nextjs/locallens/lib/attractions.ts), and [`lib/planner.ts`](/D:/Programming/Nextjs/locallens/lib/planner.ts)
 - Auth/session helpers are kept in [`lib/auth.ts`](/D:/Programming/Nextjs/locallens/lib/auth.ts) and [`lib/auth/session.ts`](/D:/Programming/Nextjs/locallens/lib/auth/session.ts)
 
-### Main directories
-
-```text
-app/
-  admin/                  Admin UI, protected by role checks
-  api/                    Route handlers for auth, planner, trips, uploads, CRUD
-  attractions/[id]/       Public attraction detail page
-  planner/                Full itinerary planning experience
-  login/ signup/          Tourist authentication flows
-  admin-signup/           First-admin bootstrap flow
-components/
-  admin/                  Admin forms and actions
-  explorer/               Browse page cards, filters, map, search
-  planner/                Planner UI, itinerary editor, planner map
-  shared/                 Shared app-level UI such as theme handling
-  ui/                     Base shadcn-style primitives
-db/
-  seed.ts                 Idempotent seed script for categories + attractions
-drizzle/
-  *.sql                   Generated SQL migrations and metadata snapshots
-hooks/
-  use-day-planner.ts      Guest/account planner state orchestration
-lib/
-  db/schema.ts            Drizzle schema
-  planner-types.ts        Shared planner domain types
-  blob.ts                 Vercel Blob helpers
-```
-
 ## Local Development
 
 ### Prerequisites
@@ -127,50 +99,6 @@ The seed script in [`db/seed.ts`](/D:/Programming/Nextjs/locallens/db/seed.ts) i
 4. Create the initial admin account using the shared secret
 5. Sign in at [http://localhost:3000/login](http://localhost:3000/login)
 6. Manage content under [http://localhost:3000/admin](http://localhost:3000/admin)
-
-## Available Scripts
-
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the Next.js dev server with Turbopack |
-| `npm run build` | Build the production app |
-| `npm run start` | Run the production server |
-| `npm test` | Run the lightweight automated test suite for validation and planner utilities |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run TypeScript in no-emit mode |
-| `npm run format` | Format `ts` and `tsx` files with Prettier |
-| `npm run db:seed` | Seed categories and attractions |
-
-## Route Map
-
-### App routes
-
-| Route | Purpose |
-| --- | --- |
-| `/` | Public attraction explorer with search, category filters, planner drawer, and map/grid switch |
-| `/attractions/[id]` | Public attraction detail page |
-| `/planner` | Full itinerary planner experience |
-| `/login` | Tourist/admin login |
-| `/signup` | Tourist account registration |
-| `/admin-signup` | Admin bootstrap form guarded by `ADMIN_SECRET` |
-| `/admin` | Admin dashboard landing page |
-| `/admin/attractions` | Attraction management list |
-| `/admin/attractions/new` | Create attraction form |
-| `/admin/attractions/[id]` | Edit attraction form |
-
-### API routes
-
-| Route | Methods | Notes |
-| --- | --- | --- |
-| `/api/auth/[...all]` | `GET`, `POST` | Better Auth handler |
-| `/api/admin-signup` | `POST` | Creates the first admin account using `ADMIN_SECRET` |
-| `/api/check-admin` | `GET` | Returns current admin status |
-| `/api/attractions` | `POST` | Admin-only attraction creation |
-| `/api/attractions/[id]` | `GET`, `PUT`, `DELETE` | Attraction read/update/delete; writes are admin-only |
-| `/api/blob` | `POST` | Admin-only image upload to Vercel Blob |
-| `/api/planner` | `GET`, `PUT`, `DELETE` | Current signed-in user's working planner |
-| `/api/trips` | `GET`, `POST` | List saved trips or create a new saved trip |
-| `/api/trips/[id]` | `GET`, `PUT` | Read or update a specific saved trip |
 
 ## Planner Behavior
 
