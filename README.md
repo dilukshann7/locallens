@@ -64,13 +64,13 @@ Create a local `.env` file with the variables below.
 
 ### Environment Variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | Yes | PostgreSQL connection string used by Drizzle and the seed script |
-| `BETTER_AUTH_SECRET` | Yes | Better Auth signing secret |
-| `BETTER_AUTH_URL` | Yes | Base URL for Better Auth, typically `http://localhost:3000` in local dev |
-| `BLOB_READ_WRITE_TOKEN` | For admin uploads | Enables image upload and deletion through Vercel Blob |
-| `ADMIN_SECRET` | For admin bootstrap | Shared secret used by `/admin-signup` to create the first admin |
+| Variable                | Required            | Purpose                                                                  |
+| ----------------------- | ------------------- | ------------------------------------------------------------------------ |
+| `DATABASE_URL`          | Yes                 | PostgreSQL connection string used by Drizzle and the seed script         |
+| `BETTER_AUTH_SECRET`    | Yes                 | Better Auth signing secret                                               |
+| `BETTER_AUTH_URL`       | Yes                 | Base URL for Better Auth, typically `http://localhost:3000` in local dev |
+| `BLOB_READ_WRITE_TOKEN` | For admin uploads   | Enables image upload and deletion through Vercel Blob                    |
+| `ADMIN_SECRET`          | For admin bootstrap | Shared secret used by `/admin-signup` to create the first admin          |
 
 ### Run the app
 
