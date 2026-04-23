@@ -1,6 +1,8 @@
+import { cache } from "react"
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { notFound } from "next/navigation"
+import { notFound, permanentRedirect } from "next/navigation"
 import {
   ArrowLeft,
   CalendarDays,
@@ -17,24 +19,56 @@ import { ThemeToggle } from "@/components/shared/theme-toggle"
 import { getActiveAttractionBySlugOrId } from "@/lib/attractions"
 import { getCurrentUserRecord } from "@/lib/auth/session"
 import { getReviewsByAttractionId } from "@/lib/reviews"
+import { createPageMetadata, truncateText } from "@/lib/seo"
 
 export const dynamic = "force-dynamic"
 
+interface AttractionPageProps {
+  params: Promise<{ id: string }>
+}
+
+const getAttractionForPage = cache(async (identifier: string) =>
+  getActiveAttractionBySlugOrId(identifier)
+)
+
+export async function generateMetadata({
+  params,
+}: AttractionPageProps): Promise<Metadata> {
+  const { id } = await params
+  const attraction = await getAttractionForPage(id)
+
+  if (!attraction) {
+    return createPageMetadata({
+      title: "Attraction Not Found",
+      description: "This attraction could not be found.",
+    })
+  }
+
+  return createPageMetadata({
+    title: `${attraction.name} Travel Guide`,
+    description:
+      attraction.shortDescription ?? truncateText(attraction.description),
+  })
+}
+
 export default async function AttractionDetailPage({
   params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+}: AttractionPageProps) {
   const { id } = await params
-  const [attraction, reviews, currentUser] = await Promise.all([
-    getActiveAttractionBySlugOrId(id),
-    getReviewsByAttractionId(id),
-    getCurrentUserRecord(),
-  ])
+  const attraction = await getAttractionForPage(id)
 
   if (!attraction) {
     notFound()
   }
+
+  if (id !== attraction.slug) {
+    permanentRedirect(`/attractions/${attraction.slug}`)
+  }
+
+  const [reviews, currentUser] = await Promise.all([
+    getReviewsByAttractionId(attraction.id),
+    getCurrentUserRecord(),
+  ])
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-8 text-zinc-950 sm:px-6 lg:px-8 dark:bg-zinc-950 dark:text-zinc-50">
