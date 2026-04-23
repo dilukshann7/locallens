@@ -140,10 +140,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
           href="/"
           className="emil-button flex items-center gap-2 text-zinc-900 dark:text-zinc-50"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900">
-            <Compass className="h-5 w-5" />
-          </div>
-          <span className="text-lg font-bold tracking-tight">LocalLens</span>
+          <span className="text-xl font-bold tracking-tight">LocalLens</span>
         </Link>
         <ThemeToggle />
       </div>
@@ -546,9 +543,7 @@ export function PlannerPage({ attractions }: PlannerPageProps) {
                               </div>
                               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                                 {trip.tripDate
-                                  ? new Date(
-                                      trip.tripDate
-                                    ).toLocaleDateString()
+                                  ? new Date(trip.tripDate).toLocaleDateString()
                                   : "No date set"}{" "}
                                 • {trip.stopCount} stop
                                 {trip.stopCount === 1 ? "" : "s"}
