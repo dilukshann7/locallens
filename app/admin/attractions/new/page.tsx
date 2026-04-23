@@ -4,6 +4,8 @@ import { AttractionForm } from "@/components/admin/attraction-form"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 async function getCategories() {
   return db.select().from(category).orderBy(category.name)
 }

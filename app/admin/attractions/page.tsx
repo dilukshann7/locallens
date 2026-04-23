@@ -6,6 +6,8 @@ import Link from "next/link"
 import { MapPin, Plus, Edit, Eye, EyeOff, Search, Sparkles } from "lucide-react"
 import { AdminDeleteAttractionButton } from "@/components/admin/delete-attraction-button"
 
+export const dynamic = "force-dynamic"
+
 async function toggleAttractionVisibility(id: string, currentState: boolean) {
   "use server"
   await db

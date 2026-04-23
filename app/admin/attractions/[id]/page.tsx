@@ -6,6 +6,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+
 async function getAttraction(id: string) {
   return db
     .select()
