@@ -7,11 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { siteConfig } from "@/lib/seo"
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-sans" })
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["500", "600", "700"],
-})
 
 export const metadata: Metadata = {
   applicationName: siteConfig.name,
@@ -42,7 +37,7 @@ export default function RootLayout({
     <html
       lang="en-LK"
       suppressHydrationWarning
-      className={`${outfit.variable} ${cormorant.variable}`}
+      className={`${outfit.variable}`}
     >
       <body className="font-sans antialiased">
         <ThemeProvider>
