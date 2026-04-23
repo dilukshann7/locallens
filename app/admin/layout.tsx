@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
@@ -18,6 +19,15 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { ThemeToggle } from "@/components/shared/theme-toggle"
+import { siteConfig } from "@/lib/seo"
+
+export const metadata: Metadata = {
+  title: {
+    default: "Admin",
+    template: `%s | Admin | ${siteConfig.name}`,
+  },
+  description: "Administrative surfaces for managing LocalLens content.",
+}
 
 export default async function AdminLayout({
   children,
