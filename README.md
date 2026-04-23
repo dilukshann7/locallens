@@ -135,6 +135,7 @@ The seed script in [`db/seed.ts`](/D:/Programming/Nextjs/locallens/db/seed.ts) i
 | `npm run dev` | Start the Next.js dev server with Turbopack |
 | `npm run build` | Build the production app |
 | `npm run start` | Run the production server |
+| `npm test` | Run the lightweight automated test suite for validation and planner utilities |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run TypeScript in no-emit mode |
 | `npm run format` | Format `ts` and `tsx` files with Prettier |
@@ -203,7 +204,7 @@ Notable schema choices:
 - Admin protection is enforced in both route layout logic and API guards
 - Attraction images are expected from Vercel Blob, with Next.js remote image support also configured for Unsplash
 - SQL migrations are committed under [`drizzle/`](/D:/Programming/Nextjs/locallens/drizzle)
-- There is currently no automated test suite in the repo; use `npm run lint` and `npm run typecheck` as the baseline verification steps
+- A lightweight automated test suite is available via `npm test`; `npm run lint` and `npm run typecheck` remain useful baseline verification steps
 
 ## Scope
 
