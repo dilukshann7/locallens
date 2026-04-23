@@ -1,17 +1,12 @@
-import { TouristExplorer } from "@/components/explorer/tourist-explorer"
-import { getActiveAttractions, getCategories } from "@/lib/attractions"
+import { HomePage } from "@/components/home/homepage"
+import { createPageMetadata } from "@/lib/seo"
 
-export const dynamic = "force-dynamic"
+export const metadata = createPageMetadata({
+  title: "Beragala And Ella Travel Guide",
+  description:
+    "Plan scenic day trips, discover local attractions, and explore practical travel tips around Beragala and Ella with LocalLens.",
+})
 
-export default async function HomePage() {
-  const [attractions, categories] = await Promise.all([
-    getActiveAttractions(),
-    getCategories(),
-  ])
-
-  return (
-    <main className="min-h-screen">
-      <TouristExplorer attractions={attractions} categories={categories} />
-    </main>
-  )
+export default function HomeRoute() {
+  return <HomePage />
 }
