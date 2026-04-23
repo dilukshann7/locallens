@@ -4,7 +4,6 @@ import { useScroll, useMotionValueEvent } from "framer-motion"
 import { useState } from "react"
 
 import {
-  BackgroundTexture,
   DestinationsSection,
   FeaturesSection,
   FooterSection,
@@ -25,8 +24,6 @@ export function HomePage() {
 
   return (
     <main className="dark relative min-h-screen overflow-x-hidden bg-background text-foreground selection:bg-primary/20">
-      <BackgroundTexture />
-
       <div className="relative z-10">
         <HomeHeader scrolled={scrolled} />
         <HeroSection />

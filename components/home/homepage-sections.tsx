@@ -23,17 +23,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export function BackgroundTexture() {
-  return (
-    <div className="pointer-events-none fixed inset-0 z-0">
-      <div className="absolute inset-0 bg-[radial-gradient(hsl(var(--muted-foreground)/0.06)_1px,transparent_1px)] bg-[size:24px_24px]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,hsl(var(--primary)/0.08),transparent_60%)]" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border/60 to-transparent" />
-      <div className="absolute top-0 left-1/2 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.06),transparent_70%)] blur-3xl" />
-    </div>
-  )
-}
-
 export function HomeHeader({ scrolled }: { scrolled: boolean }) {
   return (
     <motion.header
