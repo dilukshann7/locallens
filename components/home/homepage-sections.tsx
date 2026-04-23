@@ -139,11 +139,7 @@ export function HeroSection() {
         transition={{ ...spring, delay: 0.34 }}
         className="mt-9 flex flex-col items-center gap-3 sm:flex-row"
       >
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={micro}
-        >
+        <motion.div>
           <Button
             asChild
             size="lg"
@@ -226,7 +222,7 @@ export function DestinationsSection() {
               href="/explore"
               className="group flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
-              View all 40+ stops
+              View all 10+ stops
               <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </motion.div>
