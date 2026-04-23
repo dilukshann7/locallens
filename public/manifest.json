@@ -1,0 +1,10 @@
+{
+  "name": "LocalLens",
+  "short_name": "LocalLens",
+  "description": "Local attraction browsing and day-trip planning for Beragala and Ella.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#059669"
+}
